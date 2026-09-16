@@ -1,0 +1,17 @@
+{
+  "name": "jewelry-quote-v2-6-jzj9999",
+  "version": "2.6.0",
+  "private": true,
+  "description": "Jewelry quotation app using JZJ9999 黄金9999 sales price",
+  "scripts": {
+    "start": "node server.js",
+    "postinstall": "npx playwright install chromium"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "playwright": "^1.55.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
