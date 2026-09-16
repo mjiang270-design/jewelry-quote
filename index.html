@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#101114">
-<title>珠宝销售报价 V3.0</title>
+<title>珠宝销售报价 V3.1</title>
 <style>
 :root{--bg:#f4f5f7;--card:#fff;--text:#16181c;--muted:#737982;--line:#e6e8ec;--dark:#101114;--accent:#8c6a20;--soft:#f7f2e7;--blue:#0b6bcb}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
@@ -100,6 +100,20 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
 .flow-toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(18px);background:#111;color:#fff;padding:10px 15px;border-radius:999px;font-size:12px;z-index:99;opacity:0;pointer-events:none;transition:.2s;white-space:nowrap;max-width:90vw}
 .flow-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+
+.product-photo-box{grid-column:1/-1}
+.product-photo-line{display:grid;grid-template-columns:118px 1fr;gap:12px;align-items:center}
+.product-photo-preview{height:104px;border:1px solid var(--line);border-radius:12px;background:#fafafa;display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--muted);font-size:11px}
+.product-photo-preview img{width:100%;height:100%;object-fit:contain;background:#fff}
+.product-photo-tools input{height:auto;border:0;padding:0;font-size:13px}
+.item-with-photo{display:flex;gap:10px;align-items:flex-start}
+.item-thumb{width:62px;height:62px;flex:0 0 62px;border-radius:9px;border:1px solid var(--line);background:#fafafa;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:9px}
+.item-thumb img{width:100%;height:100%;object-fit:contain;background:#fff}
+.q-line-item{display:flex;align-items:center;gap:8px;min-width:180px}
+.q-line-thumb{width:44px;height:44px;flex:0 0 44px;border:1px solid var(--line);border-radius:7px;background:#fafafa;overflow:hidden}
+.q-line-thumb img{width:100%;height:100%;object-fit:contain;background:#fff}
+@media(max-width:560px){.product-photo-line{grid-template-columns:92px 1fr}.product-photo-preview{height:86px}}
+
 @media(max-width:560px){
   .sim-row{grid-template-columns:92px 1fr 30px;padding:8px;gap:7px}
   .sim-result{gap:10px}
@@ -112,7 +126,7 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
 </head>
 <body>
 <div class="app">
-  <div class="topbar"><span class="brand">珠宝销售报价</span><span class="version">V3.0 报价流程修复</span></div>
+  <div class="topbar"><span class="brand">珠宝销售报价</span><span class="version">V3.1 产品图片修复</span></div>
 
   <section class="page active" id="home">
 <div class="settings">
@@ -177,6 +191,17 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
       <div class="field"><label>净金重 Gold Weight</label><input id="goldWeight" type="number" value="20" step=".01"><span class="unit">g</span></div>
       <div class="field"><label>报价使用金价 <span id="goldPriceBadge" class="badge">可手动</span></label><input id="goldPrice" type="number" value="990" step=".01"><span class="unit">RMB/g</span></div>
       <div class="field"><label>Gold Loss <span class="badge">默认13%</span></label><input id="loss" type="number" value="13" step=".1"><span class="unit">%</span></div>
+      <div class="field product-photo-box">
+        <label>当前产品图片 <span class="badge">随产品保存</span></label>
+        <div class="product-photo-line">
+          <div id="currentPhotoPreview" class="product-photo-preview">未选择图片</div>
+          <div class="product-photo-tools">
+            <input id="productPhotoInput" type="file" accept="image/*">
+            <div class="hint">先为当前产品选择图片，再加入多款报价单。系统会压缩图片并跟随该产品保存。</div>
+            <button class="chip" type="button" style="margin-top:7px" onclick="clearCurrentPhoto()">清除图片</button>
+          </div>
+        </div>
+      </div>
     </div></div>
 
     <div class="card"><h2>石头与工费</h2><div class="grid">
@@ -231,7 +256,7 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
     <div class="card" id="customerInfoCard"><h2>客户资料</h2><div class="grid">
       <div class="field"><label>公司 / 品牌</label><input id="companyName" value="JEWELRY"></div><div class="field"><label>客户名称</label><input id="customerName" placeholder="Customer name" autocomplete="name"></div>
       <div class="field"><label>报价单号</label><input id="quoteNo" placeholder="Q-20260915-001"></div><div class="field"><label>日期</label><input id="quoteDate" type="date"></div>
-      <div class="field"><label>有效期</label><input id="validDays" type="number" value="7" min="1"><span class="unit">days</span></div><div class="field"><label>产品图片</label><input id="photoInput" type="file" accept="image/*"></div>
+      <div class="field"><label>有效期</label><input id="validDays" type="number" value="7" min="1"><span class="unit">days</span></div><div class="field"><label>产品图片</label><input value="图片已随各产品保存" readonly></div>
       <div class="field full">
         <div id="validityBox" class="validity-box">
           <div class="validity-top"><div><div class="validity-status" id="validityStatus">报价有效</div><div class="validity-date" id="validityDetail">—</div></div><span id="validityPill" class="status-pill valid">VALID</span></div>
@@ -431,10 +456,11 @@ function setupLiveTimer(){
 const DRAFT_FIELDS=['product','productQty','metal','purity','totalWeight','stoneWeight','goldWeight','goldPrice','loss','stoneQty','settingUnit','diamondCost','labourCost','logoCost','fx','salesRate','autoLiveGold','companyName','customerName','quoteNo','quoteDate','validDays','description','note'];
 function draftValue(id){const e=$(id);return !e?null:(e.type==='checkbox'?e.checked:e.value)}
 function saveDraft(){const d={};DRAFT_FIELDS.forEach(id=>{if($(id))d[id]=draftValue(id)});try{localStorage.setItem('jq_draft_v24',JSON.stringify(d));localStorage.setItem('jq_quote_cart_v24',JSON.stringify(quoteCart));
-    localStorage.setItem('jq_sim_weights_v28',JSON.stringify(simWeights));if($('draftStatus'))$('draftStatus').textContent='● 已保存'}catch(e){if($('draftStatus'))$('draftStatus').textContent='保存空间不足'}}
+    localStorage.setItem('jq_sim_weights_v28',JSON.stringify(simWeights));
+    try{if(photoData)localStorage.setItem('jq_current_photo_v31',photoData);else localStorage.removeItem('jq_current_photo_v31')}catch(_e){}if($('draftStatus'))$('draftStatus').textContent='● 已保存'}catch(e){if($('draftStatus'))$('draftStatus').textContent='保存空间不足'}}
 function scheduleDraftSave(){if($('draftStatus'))$('draftStatus').textContent='保存中…';clearTimeout(draftSaveTimer);draftSaveTimer=setTimeout(saveDraft,180)}
-function loadDraft(){try{const d=JSON.parse(localStorage.getItem('jq_draft_v24')||'{}');Object.keys(d).forEach(id=>{const e=$(id);if(!e)return;if(e.type==='checkbox')e.checked=!!d[id];else e.value=d[id]});const c=JSON.parse(localStorage.getItem('jq_quote_cart_v24')||'[]');if(Array.isArray(c))quoteCart=c;const s=JSON.parse(localStorage.getItem('jq_sim_weights_v28')||'[]');if(Array.isArray(s))simWeights=s.map(v=>Number(v)).filter(v=>Number.isFinite(v)&&v>=0)}catch(e){}}
-function resetDraft(){if(!confirm('清空当前产品输入？已加入报价单的产品不会删除。'))return;$('product').value='';$('productQty').value=1;$('metal').value='75.5';$('purity').value='75.5';$('totalWeight').value=20;$('stoneWeight').value=0;$('goldWeight').value=20;$('stoneQty').value=0;$('diamondCost').value=0;$('labourCost').value=800;$('logoCost').value=35;goldLock={locked:false,price:null,lockedAt:null,source:'manual'};try{localStorage.removeItem('jq_current_gold_lock')}catch(e){}photoData='';if($('photoInput'))$('photoInput').value='';simWeights=[];renderSimRows();updateGoldLockUI();calculate();saveDraft()}
+function loadDraft(){try{const d=JSON.parse(localStorage.getItem('jq_draft_v24')||'{}');Object.keys(d).forEach(id=>{const e=$(id);if(!e)return;if(e.type==='checkbox')e.checked=!!d[id];else e.value=d[id]});const c=JSON.parse(localStorage.getItem('jq_quote_cart_v24')||'[]');if(Array.isArray(c))quoteCart=c;const s=JSON.parse(localStorage.getItem('jq_sim_weights_v28')||'[]');if(Array.isArray(s))simWeights=s.map(v=>Number(v)).filter(v=>Number.isFinite(v)&&v>=0);photoData=localStorage.getItem('jq_current_photo_v31')||''}catch(e){}}
+function resetDraft(){if(!confirm('清空当前产品输入？已加入报价单的产品不会删除。'))return;$('product').value='';$('productQty').value=1;$('metal').value='75.5';$('purity').value='75.5';$('totalWeight').value=20;$('stoneWeight').value=0;$('goldWeight').value=20;$('stoneQty').value=0;$('diamondCost').value=0;$('labourCost').value=800;$('logoCost').value=35;goldLock={locked:false,price:null,lockedAt:null,source:'manual'};try{localStorage.removeItem('jq_current_gold_lock')}catch(e){}photoData='';try{localStorage.removeItem('jq_current_photo_v31')}catch(e){};if($('productPhotoInput'))$('productPhotoInput').value='';renderCurrentPhotoPreview();simWeights=[];renderSimRows();updateGoldLockUI();calculate();saveDraft()}
 function cartTotals(){return quoteCart.reduce((a,x)=>{a.qty+=Number(x.qty)||0;a.total+=Number(x.total)||0;return a},{qty:0,total:0})}
 function currentItemSnapshot(){const c=calculate();return{id:Date.now(),product:$('product').value.trim()||'Jewelry Item',metal:$('metal').options[$('metal').selectedIndex].text,qty:c.qty,totalWeight:n('totalWeight'),stoneWeight:n('stoneWeight'),goldWeight:n('goldWeight'),description:$('description').value.trim()||'',unit:Math.round(c.sale),total:Math.round(c.totalSale),goldPrice:currentGoldPrice(),goldLocked:goldLock.locked,goldLockedAt:goldLock.lockedAt,salesRate:n('salesRate'),photo:photoData||''}}
 function itemSignature(x){
@@ -478,9 +504,9 @@ function saveCurrentAndGoCustomer(){
   showFlowToast(`已保存 ${saved.product}，请填写客户信息`);
 }
 function removeQuoteItem(id){quoteCart=quoteCart.filter(x=>String(x.id)!==String(id));saveDraft();renderQuoteItems();buildQuote()}
-function editQuoteItem(id){const x=quoteCart.find(v=>String(v.id)===String(id));if(!x)return;$('product').value=x.product;$('productQty').value=x.qty;const o=[...$('metal').options].find(o=>o.text===x.metal);if(o){$('metal').value=o.value;$('purity').value=o.value}$('totalWeight').value=x.totalWeight;$('stoneWeight').value=x.stoneWeight;$('goldWeight').value=x.goldWeight;if(x.description)$('description').value=x.description;if(x.goldPrice)$('goldPrice').value=Number(x.goldPrice).toFixed(2);goldLock=x.goldLocked?{locked:true,price:Number(x.goldPrice),lockedAt:x.goldLockedAt||new Date().toISOString(),source:'manual'}:{locked:false,price:null,lockedAt:null,source:'manual'};photoData=x.photo||'';updateGoldLockUI();calculate();saveDraft();showPage('calc')}
+function editQuoteItem(id){const x=quoteCart.find(v=>String(v.id)===String(id));if(!x)return;$('product').value=x.product;$('productQty').value=x.qty;const o=[...$('metal').options].find(o=>o.text===x.metal);if(o){$('metal').value=o.value;$('purity').value=o.value}$('totalWeight').value=x.totalWeight;$('stoneWeight').value=x.stoneWeight;$('goldWeight').value=x.goldWeight;if(x.description)$('description').value=x.description;if(x.goldPrice)$('goldPrice').value=Number(x.goldPrice).toFixed(2);goldLock=x.goldLocked?{locked:true,price:Number(x.goldPrice),lockedAt:x.goldLockedAt||new Date().toISOString(),source:'manual'}:{locked:false,price:null,lockedAt:null,source:'manual'};photoData=x.photo||'';renderCurrentPhotoPreview();updateGoldLockUI();calculate();saveDraft();showPage('calc')}
 function clearQuoteItems(){if(quoteCart.length&&confirm('确定清空本次多款报价中的全部产品吗？')){quoteCart=[];saveDraft();renderQuoteItems();buildQuote()}}
-function renderQuoteItems(){if(!$('quoteItems'))return;const t=cartTotals();$('cartSummaryText').textContent=`${quoteCart.length} 款 / ${t.qty} 件`;$('cartCount').textContent=quoteCart.length;if(!quoteCart.length){$('quoteItems').innerHTML='<div class="empty" style="padding:20px 8px">还没有产品。回到“报价”页面计算后，点击“加入多款报价单”。</div>';return}$('quoteItems').innerHTML=quoteCart.map((x,i)=>`<div class="item-card"><div class="item-top"><div><div class="item-name">${i+1}. ${esc(x.product)}</div><div class="item-meta">${esc(x.metal)} · Gold ${Number(x.goldWeight).toFixed(2)}g · QTY ${x.qty}${x.goldLocked?' · 🔒 '+Number(x.goldPrice).toFixed(2):''}</div></div><div class="item-price">AED ${Number(x.total).toLocaleString()}</div></div><div class="item-actions"><button onclick="editQuoteItem('${x.id}')">载入查看</button><button onclick="removeQuoteItem('${x.id}')">删除</button></div></div>`).join('')}
+function renderQuoteItems(){if(!$('quoteItems'))return;const t=cartTotals();$('cartSummaryText').textContent=`${quoteCart.length} 款 / ${t.qty} 件`;$('cartCount').textContent=quoteCart.length;if(!quoteCart.length){$('quoteItems').innerHTML='<div class="empty" style="padding:20px 8px">还没有产品。回到“报价”页面计算后，先选择产品图片，再点击“加入多款报价单”。</div>';return}$('quoteItems').innerHTML=quoteCart.map((x,i)=>`<div class="item-card"><div class="item-top"><div class="item-with-photo"><div class="item-thumb">${x.photo?`<img src="${x.photo}" alt="">`:'无图'}</div><div><div class="item-name">${i+1}. ${esc(x.product)}</div><div class="item-meta">${esc(x.metal)} · Gold ${Number(x.goldWeight).toFixed(2)}g · QTY ${x.qty}${x.goldLocked?' · 🔒 '+Number(x.goldPrice).toFixed(2):''}</div></div></div><div class="item-price">AED ${Number(x.total).toLocaleString()}</div></div><div class="item-actions"><button onclick="editQuoteItem('${x.id}')">载入查看</button><button onclick="removeQuoteItem('${x.id}')">删除</button></div></div>`).join('')}
 function effectiveQuoteItems(){return quoteCart.length?quoteCart:[currentItemSnapshot()]}
 
 function showPage(id,btn){
@@ -624,7 +650,7 @@ function updateValidityUI(){
 function today(){const d=new Date(),p=x=>String(x).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`}
 function buildQuote(){
   calculate();if(!$('quoteDate').value)$('quoteDate').value=today();$('qCompany').textContent=$('companyName').value.trim()||'JEWELRY';$('qNo').textContent=$('quoteNo').value.trim()||'—';$('qCustomer').textContent=$('customerName').value.trim()||'—';$('qDate').textContent=$('quoteDate').value||'—';$('qValidity').textContent=Math.max(1,Math.round(n('validDays')||7))+' days';updateValidityUI();
-  const items=effectiveQuoteItems(),t=items.reduce((a,x)=>{a.qty+=Number(x.qty)||0;a.total+=Number(x.total)||0;return a},{qty:0,total:0});$('qItemsBody').innerHTML=items.map((x,i)=>`<tr><td><div class="q-item-name">${i+1}. ${esc(x.product)}</div><div class="q-item-spec">${esc(x.metal)} · Gold ${Number(x.goldWeight).toFixed(2)}g${Number(x.stoneWeight)>0?' · Stone '+Number(x.stoneWeight).toFixed(2)+'ct':''}${x.description?' · '+esc(x.description):''}</div></td><td>${x.qty}</td><td>AED ${Number(x.unit).toLocaleString()}</td><td><strong>AED ${Number(x.total).toLocaleString()}</strong></td></tr>`).join('');$('qItemCount').textContent=items.length;$('qTotalQty').textContent=t.qty;$('qGrandTotal').textContent=Math.round(t.total).toLocaleString();$('qNote').textContent=$('note').value.trim();renderQuoteItems();scheduleDraftSave();
+  const items=effectiveQuoteItems(),t=items.reduce((a,x)=>{a.qty+=Number(x.qty)||0;a.total+=Number(x.total)||0;return a},{qty:0,total:0});$('qItemsBody').innerHTML=items.map((x,i)=>`<tr><td><div class="q-line-item"><div class="q-line-thumb">${x.photo?`<img src="${x.photo}" alt="">`:''}</div><div><div class="q-item-name">${i+1}. ${esc(x.product)}</div><div class="q-item-spec">${esc(x.metal)} · Gold ${Number(x.goldWeight).toFixed(2)}g${Number(x.stoneWeight)>0?' · Stone '+Number(x.stoneWeight).toFixed(2)+'ct':''}${x.description?' · '+esc(x.description):''}</div></div></div></td><td>${x.qty}</td><td>AED ${Number(x.unit).toLocaleString()}</td><td><strong>AED ${Number(x.total).toLocaleString()}</strong></td></tr>`).join('');$('qItemCount').textContent=items.length;$('qTotalQty').textContent=t.qty;$('qGrandTotal').textContent=Math.round(t.total).toLocaleString();$('qNote').textContent=$('note').value.trim();renderQuoteItems();scheduleDraftSave();
 }
 function saveSettings(){try{localStorage.setItem('jq_settings',JSON.stringify({goldPrice:n('goldPrice'),fx:n('fx'),loss:n('loss'),salesRate:n('salesRate'),settingUnit:n('settingUnit'),logoCost:n('logoCost'),autoLiveGold:$('autoLiveGold')?$('autoLiveGold').checked:true}))}catch(e){}}
 function loadSettings(){try{const x=JSON.parse(localStorage.getItem('jq_settings')||'{}');Object.keys(x).forEach(k=>{if(!$(k))return;if(k==='autoLiveGold')$(k).checked=!!x[k];else $(k).value=x[k]})}catch(e){}}
@@ -788,13 +814,54 @@ async function makeShareImage(){
 }
 
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,h,r):(ctx.rect(x,y,w,h));}
-$('photoInput').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{photoData=ev.target.result;buildQuote();scheduleDraftSave()};r.readAsDataURL(f)});
+function renderCurrentPhotoPreview(){
+  const box=$('currentPhotoPreview');if(!box)return;
+  box.innerHTML=photoData?`<img src="${photoData}" alt="当前产品图片">`:'未选择图片';
+}
+function clearCurrentPhoto(){
+  photoData='';
+  if($('productPhotoInput'))$('productPhotoInput').value='';
+  try{localStorage.removeItem('jq_current_photo_v31')}catch(e){}
+  renderCurrentPhotoPreview();scheduleDraftSave();
+}
+function compressProductImage(file,maxSide=900,quality=.78){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onerror=reject;
+    reader.onload=()=>{
+      const img=new Image();
+      img.onerror=reject;
+      img.onload=()=>{
+        const scale=Math.min(1,maxSide/Math.max(img.width,img.height));
+        const w=Math.max(1,Math.round(img.width*scale)),h=Math.max(1,Math.round(img.height*scale));
+        const c=document.createElement('canvas');c.width=w;c.height=h;
+        const ctx=c.getContext('2d');
+        ctx.fillStyle='#ffffff';ctx.fillRect(0,0,w,h);
+        ctx.drawImage(img,0,0,w,h);
+        resolve(c.toDataURL('image/jpeg',quality));
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+$('productPhotoInput').addEventListener('change',async e=>{
+  const f=e.target.files&&e.target.files[0];if(!f)return;
+  try{
+    photoData=await compressProductImage(f);
+    renderCurrentPhotoPreview();
+    saveDraft();
+    showFlowToast('产品图片已保存到当前产品');
+  }catch(err){
+    console.warn(err);alert('图片读取失败，请重新选择图片');
+  }
+});
 document.querySelectorAll('#calc input,#calc select').forEach(e=>e.addEventListener('input',()=>{calculate();scheduleDraftSave()}));
-document.querySelectorAll('#quote input').forEach(e=>{if(e.id!=='photoInput')e.addEventListener('input',()=>{buildQuote();scheduleDraftSave()})});
+document.querySelectorAll('#quote input').forEach(e=>e.addEventListener('input',()=>{buildQuote();scheduleDraftSave()}));
 $('autoLiveGold').addEventListener('change',()=>{setupLiveTimer();saveSettings();scheduleDraftSave()});
 loadSettings();loadDraft();loadCachedLiveGold();loadCurrentGoldLock();
 if(!$('quoteDate').value)$('quoteDate').value=today();
-renderSimRows();calculate();renderQuoteItems();buildQuote();renderHistory();
+renderCurrentPhotoPreview();renderSimRows();calculate();renderQuoteItems();buildQuote();renderHistory();
 fetchLiveGold(false);
 setupLiveTimer();
 updateValidityUI();
