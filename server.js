@@ -132,10 +132,8 @@ app.get("/api/gold", async (req, res) => {
   }
 });
 
-app.use(express.static("public"));
-
 app.get("*", (req, res) => {
-  res.sendFile(require("path").join(process.cwd(), "public", "index.html"));
+  res.sendFile(require("path").join(process.cwd(), "index.html"));
 });
 
 const server = app.listen(PORT, () => {

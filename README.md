@@ -109,3 +109,9 @@ http://localhost:3000/api/gold
 
 注意：免费 Web Service 当前为 512MB RAM。Chromium 属于相对重的运行时；
 如果实际抓价时遇到内存不足或频繁重启，需要把 Render 计划升级到更高内存。
+
+
+## GitHub 根目录扁平版
+本包专门匹配当前 GitHub 上传结构：
+Dockerfile / README.md / index.html / package.json / render.yaml / server.js
+不需要 public 文件夹；server.js 已同步调整。
