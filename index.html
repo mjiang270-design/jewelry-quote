@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#101114">
-<title>珠宝销售报价 V2.9</title>
+<title>珠宝销售报价 V3.0</title>
 <style>
 :root{--bg:#f4f5f7;--card:#fff;--text:#16181c;--muted:#737982;--line:#e6e8ec;--dark:#101114;--accent:#8c6a20;--soft:#f7f2e7;--blue:#0b6bcb}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
@@ -96,6 +96,10 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
 .sim-result small{display:block;color:var(--muted);font-size:9px;margin-bottom:2px}
 .sim-result strong{font-size:13px;white-space:nowrap}
 .sim-remove{width:30px;height:30px;border:0;border-radius:50%;background:#eceef1;color:#686d75;cursor:pointer;font-size:16px}
+
+.flow-toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(18px);background:#111;color:#fff;padding:10px 15px;border-radius:999px;font-size:12px;z-index:99;opacity:0;pointer-events:none;transition:.2s;white-space:nowrap;max-width:90vw}
+.flow-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
 @media(max-width:560px){
   .sim-row{grid-template-columns:92px 1fr 30px;padding:8px;gap:7px}
   .sim-result{gap:10px}
@@ -108,7 +112,7 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
 </head>
 <body>
 <div class="app">
-  <div class="topbar"><span class="brand">珠宝销售报价</span><span class="version">V2.9 去首页黑色说明框</span></div>
+  <div class="topbar"><span class="brand">珠宝销售报价</span><span class="version">V3.0 报价流程修复</span></div>
 
   <section class="page active" id="home">
 <div class="settings">
@@ -213,18 +217,19 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
       <div id="simList" class="sim-list"></div>
     </div>
     <button class="addbtn" onclick="addCurrentItem()">＋ 加入多款报价单</button>
-    <button class="btn outline" style="width:100%;margin-top:9px" onclick="showPage('quote');buildQuote()">查看客户报价单</button>
+    <button class="btn primary" style="width:100%;margin-top:9px" onclick="saveCurrentAndGoCustomer()">保存当前报价并填写客户信息 →</button>
+    <div class="hint" style="margin-top:7px;text-align:center">点击后会先保存当前产品，再直接进入客户资料填写区。</div>
   </section>
 
   <section class="page" id="quote">
     <div class="card"><h2>本次报价产品 <span class="badge">可多款</span></h2>
       <div class="cart-summary"><div><strong id="cartSummaryText">0 款 / 0 件</strong><small>自动汇总 QTY 和 Grand Total</small></div><span class="cart-count" id="cartCount">0</span></div>
       <div id="quoteItems" class="item-list"></div>
-      <button class="btn outline" style="width:100%;margin-top:10px" onclick="showPage('calc')">＋ 返回继续添加产品</button>
+      <button class="btn outline" style="width:100%;margin-top:10px" onclick="showPage('calc')">← 返回继续添加产品</button>
       <button class="btn outline" style="width:100%;margin-top:8px" onclick="clearQuoteItems()">清空本次产品</button>
     </div>
-    <div class="card"><h2>客户资料</h2><div class="grid">
-      <div class="field"><label>公司 / 品牌</label><input id="companyName" value="JEWELRY"></div><div class="field"><label>客户名称</label><input id="customerName" placeholder="Customer name"></div>
+    <div class="card" id="customerInfoCard"><h2>客户资料</h2><div class="grid">
+      <div class="field"><label>公司 / 品牌</label><input id="companyName" value="JEWELRY"></div><div class="field"><label>客户名称</label><input id="customerName" placeholder="Customer name" autocomplete="name"></div>
       <div class="field"><label>报价单号</label><input id="quoteNo" placeholder="Q-20260915-001"></div><div class="field"><label>日期</label><input id="quoteDate" type="date"></div>
       <div class="field"><label>有效期</label><input id="validDays" type="number" value="7" min="1"><span class="unit">days</span></div><div class="field"><label>产品图片</label><input id="photoInput" type="file" accept="image/*"></div>
       <div class="field full">
@@ -255,6 +260,7 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
   </section>
 </div>
 
+<div id="flowToast" class="flow-toast"></div>
 <div class="bottom"><div class="nav">
   <button class="active" data-page="home" onclick="showPage('home',this)"><b>⌂</b>首页</button>
   <button data-page="calc" onclick="showPage('calc',this)"><b>＋</b>报价</button>
@@ -427,11 +433,50 @@ function draftValue(id){const e=$(id);return !e?null:(e.type==='checkbox'?e.chec
 function saveDraft(){const d={};DRAFT_FIELDS.forEach(id=>{if($(id))d[id]=draftValue(id)});try{localStorage.setItem('jq_draft_v24',JSON.stringify(d));localStorage.setItem('jq_quote_cart_v24',JSON.stringify(quoteCart));
     localStorage.setItem('jq_sim_weights_v28',JSON.stringify(simWeights));if($('draftStatus'))$('draftStatus').textContent='● 已保存'}catch(e){if($('draftStatus'))$('draftStatus').textContent='保存空间不足'}}
 function scheduleDraftSave(){if($('draftStatus'))$('draftStatus').textContent='保存中…';clearTimeout(draftSaveTimer);draftSaveTimer=setTimeout(saveDraft,180)}
-function loadDraft(){try{const d=JSON.parse(localStorage.getItem('jq_draft_v24')||'{}');Object.keys(d).forEach(id=>{const e=$(id);if(!e)return;if(e.type==='checkbox')e.checked=!!d[id];else e.value=d[id]});const c=JSON.parse(localStorage.getItem('jq_quote_cart_v24')||'[]');if(Array.isArray(c))quoteCart=c}catch(e){}}
+function loadDraft(){try{const d=JSON.parse(localStorage.getItem('jq_draft_v24')||'{}');Object.keys(d).forEach(id=>{const e=$(id);if(!e)return;if(e.type==='checkbox')e.checked=!!d[id];else e.value=d[id]});const c=JSON.parse(localStorage.getItem('jq_quote_cart_v24')||'[]');if(Array.isArray(c))quoteCart=c;const s=JSON.parse(localStorage.getItem('jq_sim_weights_v28')||'[]');if(Array.isArray(s))simWeights=s.map(v=>Number(v)).filter(v=>Number.isFinite(v)&&v>=0)}catch(e){}}
 function resetDraft(){if(!confirm('清空当前产品输入？已加入报价单的产品不会删除。'))return;$('product').value='';$('productQty').value=1;$('metal').value='75.5';$('purity').value='75.5';$('totalWeight').value=20;$('stoneWeight').value=0;$('goldWeight').value=20;$('stoneQty').value=0;$('diamondCost').value=0;$('labourCost').value=800;$('logoCost').value=35;goldLock={locked:false,price:null,lockedAt:null,source:'manual'};try{localStorage.removeItem('jq_current_gold_lock')}catch(e){}photoData='';if($('photoInput'))$('photoInput').value='';simWeights=[];renderSimRows();updateGoldLockUI();calculate();saveDraft()}
 function cartTotals(){return quoteCart.reduce((a,x)=>{a.qty+=Number(x.qty)||0;a.total+=Number(x.total)||0;return a},{qty:0,total:0})}
 function currentItemSnapshot(){const c=calculate();return{id:Date.now(),product:$('product').value.trim()||'Jewelry Item',metal:$('metal').options[$('metal').selectedIndex].text,qty:c.qty,totalWeight:n('totalWeight'),stoneWeight:n('stoneWeight'),goldWeight:n('goldWeight'),description:$('description').value.trim()||'',unit:Math.round(c.sale),total:Math.round(c.totalSale),goldPrice:currentGoldPrice(),goldLocked:goldLock.locked,goldLockedAt:goldLock.lockedAt,salesRate:n('salesRate'),photo:photoData||''}}
-function addCurrentItem(){const x=currentItemSnapshot();quoteCart.push(x);saveDraft();renderQuoteItems();buildQuote();alert(`已加入：${x.product}\nQTY ${x.qty} · AED ${x.total.toLocaleString()}`)}
+function itemSignature(x){
+  return [x.product,x.metal,Number(x.qty),Number(x.totalWeight),Number(x.stoneWeight),Number(x.goldWeight),Number(x.unit),Number(x.total),Number(x.goldPrice)].join('|');
+}
+function showFlowToast(msg){
+  const t=$('flowToast');if(!t)return;
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(showFlowToast.timer);
+  showFlowToast.timer=setTimeout(()=>t.classList.remove('show'),1800);
+}
+function addCurrentItem(silent=false){
+  const x=currentItemSnapshot();
+  quoteCart.push(x);
+  saveDraft();renderQuoteItems();buildQuote();
+  if(!silent)showFlowToast(`已加入报价单：${x.product} · AED ${x.total.toLocaleString()}`);
+  return x;
+}
+function ensureCurrentItemSaved(){
+  const current=currentItemSnapshot();
+  const sig=itemSignature(current);
+  const existing=quoteCart.find(x=>itemSignature(x)===sig);
+  if(existing){saveDraft();return existing;}
+  quoteCart.push(current);
+  saveDraft();renderQuoteItems();
+  return current;
+}
+function saveCurrentAndGoCustomer(){
+  const saved=ensureCurrentItemSaved();
+  saveDraft();
+  showPage('quote');
+  requestAnimationFrame(()=>{
+    buildQuote();
+    const card=$('customerInfoCard');
+    if(card)card.scrollIntoView({behavior:'smooth',block:'start'});
+    setTimeout(()=>{
+      const customer=$('customerName');
+      if(customer)customer.focus({preventScroll:true});
+    },450);
+  });
+  showFlowToast(`已保存 ${saved.product}，请填写客户信息`);
+}
 function removeQuoteItem(id){quoteCart=quoteCart.filter(x=>String(x.id)!==String(id));saveDraft();renderQuoteItems();buildQuote()}
 function editQuoteItem(id){const x=quoteCart.find(v=>String(v.id)===String(id));if(!x)return;$('product').value=x.product;$('productQty').value=x.qty;const o=[...$('metal').options].find(o=>o.text===x.metal);if(o){$('metal').value=o.value;$('purity').value=o.value}$('totalWeight').value=x.totalWeight;$('stoneWeight').value=x.stoneWeight;$('goldWeight').value=x.goldWeight;if(x.description)$('description').value=x.description;if(x.goldPrice)$('goldPrice').value=Number(x.goldPrice).toFixed(2);goldLock=x.goldLocked?{locked:true,price:Number(x.goldPrice),lockedAt:x.goldLockedAt||new Date().toISOString(),source:'manual'}:{locked:false,price:null,lockedAt:null,source:'manual'};photoData=x.photo||'';updateGoldLockUI();calculate();saveDraft();showPage('calc')}
 function clearQuoteItems(){if(quoteCart.length&&confirm('确定清空本次多款报价中的全部产品吗？')){quoteCart=[];saveDraft();renderQuoteItems();buildQuote()}}
@@ -460,20 +505,20 @@ function calculate(){
   return {gold,setting,rmb,aed,sale,qty,totalSale:sale*qty};
 }
 function addSimRow(){
-  simWeights.push(NaN);
+  simWeights.push(null);
   renderSimRows(true);
   saveDraft();
 }
 function removeSimRow(index){
   simWeights.splice(index,1);
-  renderSimRows();
+  renderSimRows(false);
   saveDraft();
 }
 function setSimWeight(index,value){
   const v=parseFloat(value);
-  simWeights[index]=Number.isFinite(v)?Math.max(0,v):NaN;
-  updateSim();
-  saveDraft();
+  simWeights[index]=Number.isFinite(v)?Math.max(0,v):null;
+  updateSimRow(index);
+  scheduleDraftSave();
 }
 function simCalc(weight){
   const fixed=n('stoneQty')*n('settingUnit')+n('diamondCost')+n('labourCost')+n('logoCost');
@@ -483,37 +528,52 @@ function simCalc(weight){
   const sale=aed*n('salesRate');
   return {aed,sale};
 }
+function updateSimRow(index){
+  const row=document.querySelector(`[data-sim-row="${index}"]`);
+  if(!row)return;
+  const w=simWeights[index];
+  const valid=Number.isFinite(Number(w)) && w!==null;
+  const cost=row.querySelector('[data-sim-cost]');
+  const sale=row.querySelector('[data-sim-sale]');
+  if(!valid){
+    if(cost)cost.textContent='—';
+    if(sale)sale.textContent='—';
+    return;
+  }
+  const r=simCalc(Number(w));
+  if(cost)cost.textContent='AED '+Math.round(r.aed).toLocaleString('en-US');
+  if(sale)sale.textContent='AED '+Math.round(r.sale).toLocaleString('en-US');
+}
 function renderSimRows(focusLast=false){
-  const list=$('simList'), empty=$('simEmpty');
+  const list=$('simList'),empty=$('simEmpty');
   if(!list)return;
   empty.style.display=simWeights.length?'none':'block';
   list.innerHTML=simWeights.map((w,i)=>{
-    const valid=Number.isFinite(Number(w));
-    const r=valid?simCalc(Number(w)):{aed:0,sale:0};
-    return `<div class="sim-row">
+    const valid=Number.isFinite(Number(w)) && w!==null;
+    return `<div class="sim-row" data-sim-row="${i}">
       <div class="sim-weight">
-        <input class="sim-weight-input" data-index="${i}" type="number" min="0" step=".01" value="${valid?Number(w):''}" placeholder="克重" oninput="setSimWeight(${i},this.value)">
+        <input class="sim-weight-input" type="number" min="0" step=".01" value="${valid?Number(w):''}" placeholder="克重" inputmode="decimal" oninput="setSimWeight(${i},this.value)">
         <span class="unit">g</span>
       </div>
       <div class="sim-result">
-        <div><small>AED成本</small><strong>${valid?'AED '+Math.round(r.aed).toLocaleString('en-US'):'—'}</strong></div>
-        <div><small>销售价</small><strong>${valid?'AED '+Math.round(r.sale).toLocaleString('en-US'):'—'}</strong></div>
+        <div><small>AED成本</small><strong data-sim-cost>—</strong></div>
+        <div><small>销售价</small><strong data-sim-sale>—</strong></div>
       </div>
       <button class="sim-remove" type="button" onclick="removeSimRow(${i})" aria-label="删除">×</button>
     </div>`;
   }).join('');
+  updateSim();
   if(focusLast){
     requestAnimationFrame(()=>{
       const inputs=list.querySelectorAll('.sim-weight-input');
       const last=inputs[inputs.length-1];
-      if(last){last.focus();last.select();}
+      if(last)last.focus();
     });
   }
 }
 function updateSim(){
   if(!$('simList'))return;
-  // 只更新已有方案，不自动创建固定 A/B/C/D 四个输入框。
-  renderSimRows(false);
+  simWeights.forEach((_,i)=>updateSimRow(i));
 }
 
 function parseLocalDate(s){
