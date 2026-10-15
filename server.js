@@ -1,5 +1,7 @@
 const express = require("express");
 const { chromium } = require("playwright");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -39,7 +41,6 @@ async function scrapeGold9999() {
     await page.goto(SOURCE_URL, { waitUntil: "domcontentloaded", timeout: 20000 });
     await page.waitForSelector(".price-table-row", { timeout: 15000 });
 
-    // 等待“黄金9999”这一行真正出现，避免只抓到骨架屏。
     await page.waitForFunction(() => {
       return [...document.querySelectorAll(".price-table-row")]
         .some(row => (row.querySelector(".symbol-name")?.textContent || "").trim() === "黄金9999");
@@ -49,9 +50,7 @@ async function scrapeGold9999() {
       const rows = [...document.querySelectorAll(".price-table-row")];
       const row = rows.find(r => (r.querySelector(".symbol-name")?.textContent || "").trim() === "黄金9999");
       if (!row) return null;
-
       const text = sel => row.querySelector(sel)?.textContent?.trim() || null;
-
       return {
         name: text(".symbol-name"),
         bidPrice: text(".el-col:nth-child(2) .symbole-price span"),
@@ -100,7 +99,6 @@ async function getGold9999(force = false) {
   try {
     return await scrapePromise;
   } catch (err) {
-    // 不是备用行情源。这里只回退到“同一个融通金源”的最近一次成功数据。
     if (cache) {
       return {
         ...cache.data,
@@ -114,7 +112,7 @@ async function getGold9999(force = false) {
 }
 
 app.get("/api/health", (req, res) => {
-  res.json({ ok: true, service: "jewelry-quote-v2.6", time: new Date().toISOString() });
+  res.json({ ok: true, service: "jewelry-quote-v3.3", time: new Date().toISOString() });
 });
 
 app.get("/api/gold", async (req, res) => {
@@ -132,12 +130,26 @@ app.get("/api/gold", async (req, res) => {
   }
 });
 
+app.get("/mobile-v4.css", (req, res) => {
+  res.type("text/css").set("Cache-Control", "no-store");
+  res.sendFile(path.join(process.cwd(), "mobile-v4.css"));
+});
+
+app.get("/ux-v4.js", (req, res) => {
+  res.type("application/javascript").set("Cache-Control", "no-store");
+  res.sendFile(path.join(process.cwd(), "ux-v4.js"));
+});
+
 app.get("*", (req, res) => {
-  res.sendFile(require("path").join(process.cwd(), "index.html"));
+  const file = path.join(process.cwd(), "index.html");
+  let html = fs.readFileSync(file, "utf8");
+  html = html.replace("</head>", '<link rel="stylesheet" href="/mobile-v4.css?v=33"></head>');
+  html = html.replace("</body>", '<script src="/ux-v4.js?v=33"></script></body>');
+  res.type("html").set("Cache-Control", "no-store").send(html);
 });
 
 const server = app.listen(PORT, () => {
-  console.log(`Jewelry Quote V2.6 listening on :${PORT}`);
+  console.log(`Jewelry Quote V3.3 listening on :${PORT}`);
 });
 
 async function shutdown() {
