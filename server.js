@@ -112,7 +112,7 @@ async function getGold9999(force = false) {
 }
 
 app.get("/api/health", (req, res) => {
-  res.json({ ok: true, service: "jewelry-quote-v3.3", time: new Date().toISOString() });
+  res.json({ ok: true, service: "jewelry-quote-v3.4", time: new Date().toISOString() });
 });
 
 app.get("/api/gold", async (req, res) => {
@@ -140,16 +140,21 @@ app.get("/ux-v4.js", (req, res) => {
   res.sendFile(path.join(process.cwd(), "ux-v4.js"));
 });
 
+app.get("/currency-v34.js", (req, res) => {
+  res.type("application/javascript").set("Cache-Control", "no-store");
+  res.sendFile(path.join(process.cwd(), "currency-v34.js"));
+});
+
 app.get("*", (req, res) => {
   const file = path.join(process.cwd(), "index.html");
   let html = fs.readFileSync(file, "utf8");
-  html = html.replace("</head>", '<link rel="stylesheet" href="/mobile-v4.css?v=33"></head>');
-  html = html.replace("</body>", '<script src="/ux-v4.js?v=33"></script></body>');
+  html = html.replace("</head>", '<link rel="stylesheet" href="/mobile-v4.css?v=34"></head>');
+  html = html.replace("</body>", '<script src="/ux-v4.js?v=34"></script><script src="/currency-v34.js?v=34"></script></body>');
   res.type("html").set("Cache-Control", "no-store").send(html);
 });
 
 const server = app.listen(PORT, () => {
-  console.log(`Jewelry Quote V3.3 listening on :${PORT}`);
+  console.log(`Jewelry Quote V3.4 listening on :${PORT}`);
 });
 
 async function shutdown() {
