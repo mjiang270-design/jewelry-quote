@@ -15,7 +15,7 @@
 
   function loadCurrency(){try{const x=localStorage.getItem('jq_display_currency_v34');currency=CURRENCIES[x]?x:'AED'}catch(e){currency='AED'}}
   function saveCurrency(){try{localStorage.setItem('jq_display_currency_v34',currency)}catch(e){}}
-  function setVersion(){const v=document.querySelector('.version');if(v)v.textContent='V3.4 多币种展示'}
+  function setVersion(){const v=document.querySelector('.version');/* Core page owns its version label. */}
 
   function injectStyle(){
     if($('currencyV34Style'))return;
@@ -80,6 +80,18 @@
     if(typeof window.effectiveQuoteItems!=='function')return;
     const items=window.effectiveQuoteItems(),rows=[...document.querySelectorAll('#qItemsBody tr')];
     rows.forEach((tr,i)=>{const x=items[i],cells=tr.children;if(!x||cells.length<4)return;cells[2].textContent=money(x.unit);cells[3].innerHTML=`<strong>${money(x.total)}</strong>`});
+    rows.forEach((tr,i)=>{
+      const item=items[i];if(!item)return;
+      const options=typeof window.quoteLightOptions==='function'?window.quoteLightOptions(item):[];
+      tr.querySelectorAll('.q-compare-row b').forEach((el,j)=>{const unit=j===0?item.unit:options[j-1]?.unit;if(unit!=null)el.textContent=money(unit)+' / pc'});
+      const subtotals=tr.querySelectorAll('.q-product-total strong');
+      if(subtotals[0])subtotals[0].textContent=money(item.total);
+      if(subtotals[1]&&options[0])subtotals[1].textContent=money(options[0].unit*Number(item.qty||0));
+    });
+    if(typeof window.versionTotals==='function'){
+      const versions=window.versionTotals(items);
+      if($('qPlanTotal'))$('qPlanTotal').textContent=versions.complete?money(versions.planA):'Incomplete';
+    }
     const total=items.reduce((s,x)=>s+(Number(x.total)||0),0);
     if($('qGrandTotal'))$('qGrandTotal').textContent=numberText(total);
     const grand=$('qGrandTotal')?.parentElement;
@@ -140,7 +152,7 @@
       window.makeShareImage=async function(...args){
         const originalItems=window.effectiveQuoteItems,proto=window.CanvasRenderingContext2D&&CanvasRenderingContext2D.prototype,originalFillText=proto&&proto.fillText;
         try{
-          if(typeof originalItems==='function')window.effectiveQuoteItems=function(){return originalItems().map(x=>({...x,unit:convert(x.unit),total:convert(x.total)}))};
+          if(typeof originalItems==='function')window.effectiveQuoteItems=function(){return originalItems().map(x=>({...x,unit:convert(x.unit),total:convert(x.total),lightweightOptions:(x.lightweightOptions||[]).map(o=>({...o,unit:convert(o.unit)}))}))};
           if(proto&&originalFillText)proto.fillText=function(text,...rest){if(typeof text==='string')text=text.replace(/\bAED\b/g,cfg().code);return originalFillText.call(this,text,...rest)};
           return await baseShare.apply(this,args);
         }finally{
