@@ -5,7 +5,7 @@
 
   function updateVersion(){
     const v=qs('.version');
-    if(v)v.textContent='V3.3 销售/客户移动端优化';
+    // The core page owns its version label.
   }
 
   function installHomeBanner(){
@@ -75,105 +75,8 @@
     quote.parentNode.insertBefore(label,quote);
   }
 
-  function wrapCanvas(ctx,text,x,y,maxWidth,lineHeight,maxLines){
-    const raw=String(text||'');
-    let line='',lines=[];
-    for(const ch of raw){
-      const test=line+ch;
-      if(ctx.measureText(test).width>maxWidth&&line){
-        lines.push(line);line=ch;
-        if(lines.length>=maxLines-1)break;
-      }else line=test;
-    }
-    if(line&&lines.length<maxLines)lines.push(line);
-    const shown=lines.join('').length;
-    if(shown<raw.length&&lines.length)lines[lines.length-1]=lines[lines.length-1].replace(/…$/,'')+'…';
-    lines.forEach((l,i)=>ctx.fillText(l,x,y+i*lineHeight));
-    return Math.max(lineHeight,lines.length*lineHeight);
-  }
-
-  function drawContain(ctx,img,x,y,w,h,pad){
-    ctx.fillStyle='#fafafa';
-    if(typeof roundRect==='function'){roundRect(ctx,x,y,w,h,16);ctx.fill()}else ctx.fillRect(x,y,w,h);
-    if(!img)return;
-    const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
-    if(!iw||!ih)return;
-    const scale=Math.min((w-pad*2)/iw,(h-pad*2)/ih),dw=iw*scale,dh=ih*scale;
-    ctx.drawImage(img,x+(w-dw)/2,y+(h-dh)/2,dw,dh);
-  }
-
-  async function loadImg(src){
-    return new Promise(resolve=>{
-      if(!src)return resolve(null);
-      const im=new Image();
-      im.onload=()=>resolve(im);im.onerror=()=>resolve(null);im.src=src;
-    });
-  }
-
-  async function safeShareImage(){
-    buildQuote();
-    const items=effectiveQuoteItems();
-    if(!items.length){showFlowToast?.('没有可生成的产品');return}
-    const full=document.getElementById('fullQuoteDetails')?.checked!==false;
-    const totals=items.reduce((a,x)=>{a.qty+=Number(x.qty)||0;a.total+=Number(x.total)||0;return a},{qty:0,total:0});
-    const single=items.length===1,rowH=full?260:210;
-    const canvas=document.createElement('canvas');
-    canvas.width=1080;
-    canvas.height=Math.max(1500,single?(full?1840:1710):720+items.length*rowH+360);
-    const ctx=canvas.getContext('2d');
-    ctx.fillStyle='#f6f3ec';ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle='#fff';if(typeof roundRect==='function'){roundRect(ctx,38,38,1004,canvas.height-76,32);ctx.fill()}else ctx.fillRect(38,38,1004,canvas.height-76);
-
-    ctx.fillStyle='#17191d';ctx.font='bold 48px -apple-system,Arial';ctx.fillText((document.getElementById('companyName')?.value||'JEWELRY').slice(0,24),88,120);
-    ctx.font='24px -apple-system,Arial';ctx.fillStyle='#777';ctx.fillText('JEWELRY QUOTATION',88,164);
-    ctx.font='21px -apple-system,Arial';ctx.fillText(`Customer: ${(document.getElementById('customerName')?.value||'—').slice(0,34)}`,88,207);
-    let y=250;
-
-    if(single){
-      const item=items[0],img=await loadImg(item.photo||photoData||'');
-      drawContain(ctx,img,88,y,904,520,18);y+=565;
-      ctx.fillStyle='#17191d';ctx.font='bold 35px -apple-system,Arial';y+=wrapCanvas(ctx,item.product,88,y,900,42,2);
-      ctx.font='21px -apple-system,Arial';ctx.fillStyle='#666';ctx.fillText(`${item.metal} · QTY ${item.qty}`,88,y);y+=33;
-      if(full){
-        ctx.fillText(`Total Weight ${Number(item.totalWeight||0).toFixed(2)}g · Gold Weight ${Number(item.goldWeight||0).toFixed(2)}g`,88,y);y+=31;
-        ctx.fillText(`Stone Weight ${Number(item.stoneWeight||0).toFixed(2)}ct · Stone Qty ${Number(item.stoneQty||0)} pcs`,88,y);y+=31;
-        if(item.description){y+=wrapCanvas(ctx,`Specification: ${item.description}`,88,y,890,29,2)}
-      }else{ctx.fillText(`Gold ${Number(item.goldWeight||0).toFixed(2)}g${Number(item.stoneWeight)>0?' · Stone '+Number(item.stoneWeight).toFixed(2)+'ct':''}`,88,y);y+=34}
-      ctx.strokeStyle='#ece7db';ctx.beginPath();ctx.moveTo(88,y+8);ctx.lineTo(992,y+8);ctx.stroke();y+=38;
-      ctx.fillStyle='#17191d';ctx.font='bold 25px -apple-system,Arial';ctx.fillText(`Unit AED ${Math.round(Number(item.unit||0)).toLocaleString('en-US')}`,88,y);
-      ctx.textAlign='right';ctx.fillText(`Total AED ${Math.round(Number(item.total||0)).toLocaleString('en-US')}`,992,y);ctx.textAlign='left';y+=60;
-    }else{
-      ctx.fillStyle='#17191d';ctx.font='bold 25px -apple-system,Arial';ctx.fillText('ITEMS',88,y);y+=30;
-      for(let i=0;i<items.length;i++){
-        const item=items[i],img=await loadImg(item.photo||'');
-        drawContain(ctx,img,88,y,154,154,9);
-        ctx.fillStyle='#17191d';ctx.font='bold 24px -apple-system,Arial';wrapCanvas(ctx,`${i+1}. ${item.product}`,264,y+28,500,30,2);
-        ctx.font='18px -apple-system,Arial';ctx.fillStyle='#6b6f76';ctx.fillText(`${item.metal} · QTY ${item.qty}`,264,y+83);
-        let ty=y+111;
-        if(full){
-          ctx.fillText(`Total ${Number(item.totalWeight||0).toFixed(2)}g · Gold ${Number(item.goldWeight||0).toFixed(2)}g`,264,ty);ty+=27;
-          ctx.fillText(`Stone ${Number(item.stoneWeight||0).toFixed(2)}ct · ${Number(item.stoneQty||0)} pcs`,264,ty);ty+=27;
-          if(item.description)wrapCanvas(ctx,item.description,264,ty,500,25,2);
-        }else ctx.fillText(`Gold ${Number(item.goldWeight||0).toFixed(2)}g`,264,ty);
-        ctx.textAlign='right';ctx.fillStyle='#17191d';ctx.font='bold 22px -apple-system,Arial';ctx.fillText(`AED ${Math.round(Number(item.total||0)).toLocaleString('en-US')}`,992,y+38);
-        ctx.font='17px -apple-system,Arial';ctx.fillStyle='#777';ctx.fillText(`AED ${Math.round(Number(item.unit||0)).toLocaleString('en-US')} / pc`,992,y+69);ctx.textAlign='left';
-        ctx.strokeStyle='#efefef';ctx.beginPath();ctx.moveTo(88,y+rowH-16);ctx.lineTo(992,y+rowH-16);ctx.stroke();y+=rowH;
-      }
-    }
-
-    y+=12;
-    ctx.fillStyle='#f3eee2';if(typeof roundRect==='function'){roundRect(ctx,88,y,904,180,22);ctx.fill()}else ctx.fillRect(88,y,904,180);
-    ctx.fillStyle='#777';ctx.font='22px -apple-system,Arial';ctx.fillText(`TOTAL ITEMS  ${items.length}`,126,y+49);ctx.fillText(`TOTAL QTY  ${totals.qty}`,126,y+86);
-    ctx.fillStyle='#17191d';ctx.font='bold 55px -apple-system,Arial';ctx.fillText(`AED ${Math.round(totals.total).toLocaleString('en-US')}`,126,y+145);
-    const vi=validityInfo(document.getElementById('quoteDate').value,n('validDays'));ctx.fillStyle='#777';ctx.font='20px -apple-system,Arial';ctx.fillText(`Date: ${document.getElementById('quoteDate').value||today()}`,88,y+226);ctx.fillText(`Valid until: ${vi.validUntil}`,540,y+226);
-    document.getElementById('shareImage').src=canvas.toDataURL('image/jpeg',.92);
-    document.getElementById('shareArea').style.display='block';
-    document.getElementById('shareArea').scrollIntoView({behavior:'smooth'});
-  }
-
   function install(){
     updateVersion();installHomeBanner();collapseCostDetails();collapseMarketDetails();labelClientPreview();renderUxState();
-    if(typeof window.makeShareImage==='function')window.makeShareImage=safeShareImage;
     ['updateQuoteSessionUI','renderQuoteItems','beginNewQuote','finishQuote','removeQuoteItem','clearQuoteItems','saveCurrentAndGoCustomer'].forEach(name=>{
       const original=window[name];
       if(typeof original!=='function')return;
