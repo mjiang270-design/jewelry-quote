@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#101114">
-<title>珠宝销售报价 V3.9</title>
+<title>珠宝销售报价 V4.0</title>
 <style>
 :root{--bg:#f4f5f7;--card:#fff;--text:#16181c;--muted:#737982;--line:#e6e8ec;--dark:#101114;--accent:#8c6a20;--soft:#f7f2e7;--blue:#0b6bcb}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
@@ -164,7 +164,7 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
 </head>
 <body>
 <div class="app">
-  <div class="topbar"><span class="brand">珠宝销售报价</span><span class="version">V3.9 Plan 克重对比报价</span></div>
+  <div class="topbar"><span class="brand">珠宝销售报价</span><span class="version">V4.0 Plan 克重对比报价</span></div>
 
   <section class="page active" id="home">
 <div class="settings">
@@ -225,8 +225,8 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
     <div class="card"><h2>产品与黄金</h2><div class="grid">
       <div class="field"><label>产品名称 / 款号</label><input id="product" placeholder="例如 R001"></div>
       <div class="field"><label>产品数量 QTY</label><input id="productQty" type="number" min="1" value="1"><span class="unit">pcs</span></div>
-      <div class="field"><label>材质 / Karat</label><select id="metal" onchange="syncPurity()"><option value="37.5">9K Gold</option><option value="58.5">14K Gold</option><option value="75.5" selected>18K Gold</option><option value="99.9">24K Gold</option></select></div>
-      <div class="field"><label>含金折算系数 <span class="badge">可修改</span></label><input id="purity" type="number" value="75.5" step=".1"><span class="unit">%</span></div>
+      <div class="field"><label>材质 / Karat</label><select id="metal" onchange="syncPurity()"><option value="37.5">9K Gold</option><option value="41.6667">10K Gold</option><option value="58.5">14K Gold</option><option value="75.5" selected>18K Gold</option><option value="87.5">21K Gold</option><option value="99.9">24K Gold</option></select></div>
+      <div class="field"><label>含金折算系数 <span class="badge">可修改</span></label><input id="purity" type="number" value="75.5" step=".0001"><span class="unit">%</span></div>
       <div class="field"><label>总重 Total Weight</label><input id="totalWeight" type="number" value="20" step=".01"><span class="unit">g</span></div>
       <div class="field"><label>石重 Stone Weight</label><input id="stoneWeight" type="number" value="0" step=".01"><span class="unit">ct</span></div>
       <div class="field"><label>净金重 Gold Weight</label><input id="goldWeight" type="number" value="20" step=".01"><span class="unit">g</span></div>
