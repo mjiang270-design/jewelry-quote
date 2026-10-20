@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#101114">
-<title>珠宝销售报价 V4.0</title>
+<title>珠宝销售报价 V4.1</title>
 <style>
 :root{--bg:#f4f5f7;--card:#fff;--text:#16181c;--muted:#737982;--line:#e6e8ec;--dark:#101114;--accent:#8c6a20;--soft:#f7f2e7;--blue:#0b6bcb}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
@@ -160,11 +160,16 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
 .q-product-total{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-top:12px;font-size:13px;color:#555}
 .q-product-total strong{color:#17191d}
 @media(max-width:560px){.q-compare-row{grid-template-columns:1fr auto;gap:6px 8px;font-size:13px}.q-compare-row>strong{grid-column:1}.q-compare-row>span{grid-column:1;grid-row:auto}.q-compare-row>b{grid-column:2;grid-row:1 / 3;font-size:16px;align-self:center}.qhead{padding:16px}.qmeta{padding:14px 16px}.q-spec-list{font-size:12px}}
+.q-price-details{margin:16px 0;font-size:13px;line-height:1.6;color:#444}
+.q-price-details>strong{display:block;margin-bottom:8px;color:#17191d}
+.q-detail-row{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-variant-numeric:tabular-nums}
+.q-detail-row span{min-width:0;overflow-wrap:anywhere}.q-detail-row b{white-space:nowrap;color:#17191d}
+.q-detail-note{font-size:11px;color:#555;margin-top:8px}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="topbar"><span class="brand">珠宝销售报价</span><span class="version">V4.0 Plan 克重对比报价</span></div>
+  <div class="topbar"><span class="brand">珠宝销售报价</span><span class="version">V4.1 Plan 克重对比报价</span></div>
 
   <section class="page active" id="home">
 <div class="settings">
@@ -307,7 +312,7 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
       <div class="field full"><label>客户可见备注</label><input id="note" value="Price is subject to the quotation validity period."></div>
       <div class="field full">
         <div class="full-spec-toggle">
-          <div><strong>显示完整产品数据</strong><div class="hint" style="margin-top:2px">显示材质、总重、净金重、石重、镶石数量和产品规格；内部成本、汇率仍隐藏。</div></div>
+          <div><strong>显示完整产品数据</strong><div class="hint" style="margin-top:2px">显示材质、重量和产品规格。客户报价单与图片会列出已填写且大于 0 的价格明细。</div></div>
           <input id="fullQuoteDetails" type="checkbox" checked>
         </div>
       </div>
@@ -835,6 +840,31 @@ function updateVersionTotals(items){
   $('qPlanTotal').textContent=t.complete?'AED '+Math.round(t.planA).toLocaleString():'Incomplete';
   $('qPlanTotalNote').textContent=t.complete?'Original and Plan A are separate options. Choose one version.':'Plan A not specified for: '+t.missing.map(x=>x.product).join(', ');
 }
+function quotePriceBreakdown(item){
+  const rows=[];
+  const fx=Number(item.fx);
+  if(!Number.isFinite(fx)||fx<=0)return rows;
+  const add=(label,rmb)=>{const amount=Number(rmb)*fx;if(Number.isFinite(amount)&&amount>0)rows.push({label,amount});};
+  add('Gold · Original (incl. loss)',item.goldCost);
+  const goldFields=['goldPrice','purity','loss'];
+  if(goldFields.every(key=>item[key]!=null&&Number.isFinite(Number(item[key])))){
+    quoteLightOptions(item).forEach((o,i)=>add('Gold · '+planLabel(i)+' (incl. loss)',o.goldWeight*Number(item.goldPrice)*Number(item.purity)/100*(1+Number(item.loss)/100)));
+  }
+  add('Stones / Diamonds',item.diamondCost);
+  const setting=item.settingCost!=null?item.settingCost:Number(item.stoneQty)*Number(item.settingUnit);
+  add('Stone Setting',setting);
+  add('Labour',item.labourCost);
+  add('Logo / Engraving',item.logoCost);
+  return rows;
+}
+function quoteDetailMoney(amount){
+  return typeof window.quoteDetailCurrency==='function'?window.quoteDetailCurrency(amount):'AED '+Number(amount).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function renderPriceBreakdown(item){
+  const rows=quotePriceBreakdown(item);
+  if(!rows.length)return '';
+  return `<div class="q-price-details"><strong>Price Breakdown · Per Piece</strong>${rows.map(row=>`<div class="q-detail-row"><span>${esc(row.label)}</span><b>${quoteDetailMoney(row.amount)}</b></div>`).join('')}<div class="q-detail-note">Stone, setting, labour and engraving fees apply to each version.</div></div>`;
+}
 function renderPriceComparison(item){
   const rows=[{label:'Original',goldWeight:Number(item.goldWeight)||0,unit:Number(item.unit)||0},...quoteLightOptions(item).map((o,i)=>({...o,label:planLabel(i)}))];
   return `<div class="q-comparison">${rows.map((o,i)=>`<div class="q-compare-row ${i===0?'original':''}"><strong>${o.label}</strong><span>Gold Weight ${o.goldWeight.toFixed(2)} g</span><b>AED ${o.unit.toLocaleString()}<small> / pc</small></b></div>`).join('')}</div>`;
@@ -842,7 +872,7 @@ function renderPriceComparison(item){
 
 function buildQuote(){
   calculate();if(!$('quoteDate').value)$('quoteDate').value=today();$('qCompany').textContent=$('companyName').value.trim()||'JEWELRY';$('qNo').textContent=$('quoteNo').value.trim()||'—';$('qCustomer').textContent=$('customerName').value.trim()||'—';$('qDate').textContent=$('quoteDate').value||'—';$('qValidity').textContent=Math.max(1,Math.round(n('validDays')||7))+' days';updateValidityUI();
-  const items=effectiveQuoteItems(),t=items.reduce((a,x)=>{a.qty+=Number(x.qty)||0;a.total+=Number(x.total)||0;return a},{qty:0,total:0});const full=$('fullQuoteDetails')?$('fullQuoteDetails').checked:true;$('qItemsBody').innerHTML=items.map((x,i)=>{const specs=full?`<div class="q-spec-list"><span><b>Metal:</b> ${esc(x.metal)}</span><span><b>Total Weight:</b> ${Number(x.totalWeight||0).toFixed(2)} g</span><span><b>Gold Weight:</b> ${Number(x.goldWeight||0).toFixed(2)} g</span><span><b>Stone Weight:</b> ${Number(x.stoneWeight||0).toFixed(2)} ct</span><span><b>Stone Qty:</b> ${Number(x.stoneQty||0)} pcs</span><span><b>Specification:</b> ${x.description?esc(x.description):'—'}</span></div>`:`<div class="q-item-spec">${esc(x.metal)} · Gold ${Number(x.goldWeight||0).toFixed(2)}g${Number(x.stoneWeight)>0?' · Stone '+Number(x.stoneWeight).toFixed(2)+'ct':''}</div>`;return `<tr><td colspan="4"><div class="q-line-item"><div class="q-line-thumb">${x.photo?`<img src="${x.photo}" alt="">`:''}</div><div class="q-line-details"><div class="q-item-name">${i+1}. ${esc(x.product)}</div>${specs}</div></div>${renderPriceComparison(x)}${renderVersionSubtotals(x)}</td></tr>`}).join('');$('qItemCount').textContent=items.length;$('qTotalQty').textContent=t.qty;$('qGrandTotal').textContent=Math.round(t.total).toLocaleString();updateVersionTotals(items);invalidateShareImage();$('qNote').textContent=$('note').value.trim();renderQuoteItems();scheduleDraftSave();
+  const items=effectiveQuoteItems(),t=items.reduce((a,x)=>{a.qty+=Number(x.qty)||0;a.total+=Number(x.total)||0;return a},{qty:0,total:0});const full=$('fullQuoteDetails')?$('fullQuoteDetails').checked:true;$('qItemsBody').innerHTML=items.map((x,i)=>{const specs=full?`<div class="q-spec-list"><span><b>Metal:</b> ${esc(x.metal)}</span><span><b>Total Weight:</b> ${Number(x.totalWeight||0).toFixed(2)} g</span><span><b>Gold Weight:</b> ${Number(x.goldWeight||0).toFixed(2)} g</span><span><b>Stone Weight:</b> ${Number(x.stoneWeight||0).toFixed(2)} ct</span><span><b>Stone Qty:</b> ${Number(x.stoneQty||0)} pcs</span><span><b>Specification:</b> ${x.description?esc(x.description):'—'}</span></div>`:`<div class="q-item-spec">${esc(x.metal)} · Gold ${Number(x.goldWeight||0).toFixed(2)}g${Number(x.stoneWeight)>0?' · Stone '+Number(x.stoneWeight).toFixed(2)+'ct':''}</div>`;return `<tr><td colspan="4"><div class="q-line-item"><div class="q-line-thumb">${x.photo?`<img src="${x.photo}" alt="">`:''}</div><div class="q-line-details"><div class="q-item-name">${i+1}. ${esc(x.product)}</div>${specs}</div></div>${renderPriceComparison(x)}${renderPriceBreakdown(x)}${renderVersionSubtotals(x)}</td></tr>`}).join('');$('qItemCount').textContent=items.length;$('qTotalQty').textContent=t.qty;$('qGrandTotal').textContent=Math.round(t.total).toLocaleString();updateVersionTotals(items);invalidateShareImage();$('qNote').textContent=$('note').value.trim();renderQuoteItems();scheduleDraftSave();
 }
 function saveSettings(){try{localStorage.setItem('jq_settings',JSON.stringify({goldPrice:n('goldPrice'),fx:n('fx'),loss:n('loss'),settingUnit:n('settingUnit'),logoCost:n('logoCost'),autoLiveGold:$('autoLiveGold')?$('autoLiveGold').checked:true}))}catch(e){}}
 function loadSettings(){try{const x=JSON.parse(localStorage.getItem('jq_settings')||'{}');Object.keys(x).forEach(k=>{if(!$(k))return;if(k==='autoLiveGold')$(k).checked=!!x[k];else $(k).value=x[k]})}catch(e){}}
@@ -935,7 +965,7 @@ async function makeShareImage(){
   const headerExtra=(headerCompany.length-1)*56+(headerCustomer.length-1)*38;
   const missingNote=versionTotals(items).missing.map(x=>x.product).join(', ');
   const missingHeight=wrap('Plan A not specified for: '+missingNote,'25px -apple-system,Arial',content).length*38;
-  const logicalHeight=missingHeight+400+headerExtra+layouts.reduce((sum,l)=>sum+l.height+l.names.length*48+110+(full?88+l.specs.length*38:0)+(quoteLightOptions(l.item).length+1)*110+200,0)+650+note.length*38;
+  const logicalHeight=missingHeight+400+headerExtra+layouts.reduce((sum,l)=>sum+l.height+l.names.length*48+110+(full?88+l.specs.length*38:0)+(quoteLightOptions(l.item).length+1)*110+200+(quotePriceBreakdown(l.item).length?110+quotePriceBreakdown(l.item).length*48:0),0)+650+note.length*38;
   // Prefer 2160px PNG; cap very long sheets to stay within mobile canvas limits.
   const scale=Math.min(2,16384/logicalHeight,Math.sqrt(24000000/(width*logicalHeight)));
   const canvas=document.createElement('canvas');canvas.width=Math.floor(width*scale);canvas.height=Math.floor(logicalHeight*scale);
@@ -968,6 +998,12 @@ async function makeShareImage(){
       rule(y);text(row.label,pad,y+38,'bold 29px -apple-system,Arial','#17191d');
       text(`Gold Weight ${row.goldWeight.toFixed(2)} g`,pad,y+80,'28px -apple-system,Arial');
       text(`AED ${row.unit.toLocaleString()} / pc`,width-pad,y+58,'bold 30px -apple-system,Arial','#17191d','right');y+=110;
+    }
+    const breakdown=quotePriceBreakdown(item);
+    if(breakdown.length){
+      y+=12;text('PRICE BREAKDOWN · PER PIECE',pad,y+32,'bold 27px -apple-system,Arial','#17191d');y+=52;
+      for(const row of breakdown){text(row.label,pad,y+30,'25px -apple-system,Arial');text(quoteDetailMoney(row.amount),width-pad,y+30,'bold 27px -apple-system,Arial','#17191d','right');y+=48;}
+      text('Shared fees apply to each version.',pad,y+26,'23px -apple-system,Arial');y+=46;
     }
     rule(y);text('Original Subtotal',pad,y+46,'27px -apple-system,Arial');text(`AED ${Number(item.total).toLocaleString()}`,width-pad,y+46,'bold 31px -apple-system,Arial','#17191d','right');y+=74;
     const plan=quoteLightOptions(item)[0];
@@ -1049,6 +1085,7 @@ setInterval(()=>{updateValidityUI();if($('history').classList.contains('active')
 window.addEventListener('beforeunload',saveDraft);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveDraft()});
 </script>
 </body></html>
+
 
 
 

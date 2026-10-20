@@ -13,6 +13,8 @@
   function numberText(aed){const c=cfg();return convert(aed).toLocaleString('en-US',{minimumFractionDigits:c.decimals,maximumFractionDigits:c.decimals})}
   const money=aed=>`${cfg().code} ${numberText(aed)}`;
 
+  window.quoteDetailCurrency=aed=>`${cfg().code} ${convert(aed).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+
   function loadCurrency(){try{const x=localStorage.getItem('jq_display_currency_v34');currency=CURRENCIES[x]?x:'AED'}catch(e){currency='AED'}}
   function saveCurrency(){try{localStorage.setItem('jq_display_currency_v34',currency)}catch(e){}}
   function setVersion(){const v=document.querySelector('.version');/* Core page owns its version label. */}
@@ -92,6 +94,7 @@
       const versions=window.versionTotals(items);
       if($('qPlanTotal'))$('qPlanTotal').textContent=versions.complete?money(versions.planA):'Incomplete';
     }
+    rows.forEach((tr,i)=>{if(items[i]&&typeof window.renderPriceBreakdown==='function'){const el=tr.querySelector('.q-price-details');if(el)el.outerHTML=window.renderPriceBreakdown(items[i]);}});
     const total=items.reduce((s,x)=>s+(Number(x.total)||0),0);
     if($('qGrandTotal'))$('qGrandTotal').textContent=numberText(total);
     const grand=$('qGrandTotal')?.parentElement;
