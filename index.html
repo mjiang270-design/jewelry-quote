@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#101114">
-<title>珠宝销售报价 V3.5</title>
+<title>珠宝销售报价 V3.6</title>
 <style>
 :root{--bg:#f4f5f7;--card:#fff;--text:#16181c;--muted:#737982;--line:#e6e8ec;--dark:#101114;--accent:#8c6a20;--soft:#f7f2e7;--blue:#0b6bcb}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
@@ -79,7 +79,7 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
 
 
 .draftbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;font-size:12px;color:var(--muted)}
-.draftbar strong{color:#337047}.cart-summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:13px;background:#fff;margin-bottom:10px}.cart-summary strong{font-size:18px}.cart-summary small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.cart-count{background:var(--dark);color:#fff;border-radius:999px;padding:5px 9px;font-size:12px}.item-list{display:grid;gap:10px}.item-card{border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px}.item-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.item-name{font-weight:850;font-size:15px}.item-meta{font-size:11px;color:var(--muted);line-height:1.55;margin-top:4px}.item-price{text-align:right;font-weight:850;color:var(--accent);white-space:nowrap}.item-actions{display:flex;gap:7px;margin-top:10px}.item-actions button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 9px;font-size:12px}.quote-table{width:100%;border-collapse:collapse;font-size:12px}.quote-table th,.quote-table td{padding:10px 7px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}.quote-table th:first-child,.quote-table td:first-child{text-align:left}.quote-table th{color:var(--muted);font-weight:700;background:#fafafa}.q-item-name{font-weight:800;color:#17191d}.q-item-spec{font-size:10px;color:var(--muted);line-height:1.45;margin-top:3px}.qtotals{margin:14px 20px 18px;border-top:1px solid var(--line);padding-top:12px}.qtotalrow{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}.qtotalrow.grand{font-size:21px;font-weight:900;color:#17191d;padding-top:10px}.addbtn{background:var(--accent);color:#fff;border:0;border-radius:12px;width:100%;height:49px;font-weight:850}
+.draftbar strong{color:#337047}.cart-summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:13px;background:#fff;margin-bottom:10px}.cart-summary strong{font-size:18px}.cart-summary small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.cart-count{background:var(--dark);color:#fff;border-radius:999px;padding:5px 9px;font-size:12px}.item-list{display:grid;gap:10px}.item-card{border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px}.item-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.item-name{font-weight:850;font-size:15px}.item-meta{font-size:11px;color:var(--muted);line-height:1.55;margin-top:4px}.item-price{text-align:right;font-weight:850;color:var(--accent);white-space:nowrap}.item-actions{display:flex;gap:7px;margin-top:10px}.item-actions button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 9px;font-size:12px}.quote-table{width:100%;border-collapse:collapse;font-size:12px}.quote-table th,.quote-table td{padding:10px 7px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}.quote-table th:first-child,.quote-table td:first-child{text-align:left}.quote-table th{color:var(--muted);font-weight:700;background:#fafafa}.q-item-name{font-weight:800;color:#17191d}.q-item-spec{font-size:10px;color:var(--muted);line-height:1.45;margin-top:3px}.qtotals{margin:14px 20px 18px;border-top:1px solid var(--line);padding-top:12px}.qtotalrow{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}.qtotalrow.grand{font-size:19px;font-weight:900;color:#17191d;padding-top:10px}.addbtn{background:var(--accent);color:#fff;border:0;border-radius:12px;width:100%;height:49px;font-weight:850}
 
 
 .sim-compact-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -164,7 +164,7 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
 </head>
 <body>
 <div class="app">
-  <div class="topbar"><span class="brand">珠宝销售报价</span><span class="version">V3.5 Plan 克重对比报价</span></div>
+  <div class="topbar"><span class="brand">珠宝销售报价</span><span class="version">V3.6 Plan 克重对比报价</span></div>
 
   <section class="page active" id="home">
 <div class="settings">
@@ -320,8 +320,8 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
       <div class="qhead"><div><div class="qbrand" id="qCompany">JEWELRY</div><div class="hint">Jewelry Quotation</div></div><div class="qtitle">QUOTATION<br><small id="qNo">—</small></div></div>
       <div class="qmeta"><div><span>Customer</span><strong id="qCustomer">—</strong></div><div><span>Date</span><strong id="qDate">—</strong></div><div><span>Validity</span><strong id="qValidity">7 days</strong></div><div><span>Valid Until</span><strong id="qValidUntil">—</strong></div><div><span>Status</span><strong id="qValidityStatus">VALID</strong></div><div><span>Currency</span><strong>AED</strong></div></div>
       <div style="padding:18px 20px 0;overflow-x:auto"><table class="quote-table"><tbody id="qItemsBody"></tbody></table></div>
-      <div class="qtotals"><div class="qtotalrow"><span>Total Items</span><strong id="qItemCount">0</strong></div><div class="qtotalrow"><span>Total QTY</span><strong id="qTotalQty">0</strong></div><div class="qtotalrow grand"><span>GRAND TOTAL</span><strong>AED <span id="qGrandTotal">0</span></strong></div></div>
-      <div class="qnote" id="qNote"></div>
+      <div class="qtotals"><div class="qtotalrow"><span>Total Items</span><strong id="qItemCount">0</strong></div><div class="qtotalrow"><span>Total QTY</span><strong id="qTotalQty">0</strong></div><div class="qtotalrow grand"><span>ORIGINAL TOTAL</span><strong>AED <span id="qGrandTotal">0</span></strong></div></div>
+      <div class="qtotals" style="margin-top:0"><div class="qtotalrow grand"><span>PLAN A TOTAL</span><strong id="qPlanTotal">—</strong></div><div class="hint" id="qPlanTotalNote"></div></div><div class="qnote" id="qNote"></div>
     </div>
     <div class="actionrow"><button class="btn outline" onclick="window.print()">打印 / PDF</button><button class="btn outline" onclick="makeShareImage()">生成微信报价图片</button></div>
     <button class="btn finish-btn" onclick="finishQuote()">完成本次报价并清空 →</button>
@@ -808,6 +808,19 @@ function planLabel(index){
   let label='';for(let n=index+1;n>0;n=Math.floor((n-1)/26))label=String.fromCharCode(65+(n-1)%26)+label;
   return 'Plan '+label;
 }
+function versionTotals(items){
+  const missing=items.filter(x=>!quoteLightOptions(x).length);
+  return {original:items.reduce((sum,x)=>sum+(Number(x.total)||0),0),planA:items.reduce((sum,x)=>sum+(quoteLightOptions(x)[0]?.unit||0)*(Number(x.qty)||0),0),missing,complete:missing.length===0};
+}
+function renderVersionSubtotals(item){
+  const option=quoteLightOptions(item)[0];
+  return `<div class="q-product-total"><span>Original Subtotal · QTY ${item.qty}</span><strong>AED ${Number(item.total).toLocaleString()}</strong></div><div class="q-product-total"><span>Plan A Subtotal · QTY ${item.qty}</span><strong>${option?'AED '+Math.round(option.unit*Number(item.qty||0)).toLocaleString():'Not specified'}</strong></div>`;
+}
+function updateVersionTotals(items){
+  const t=versionTotals(items);
+  $('qPlanTotal').textContent=t.complete?'AED '+Math.round(t.planA).toLocaleString():'Incomplete';
+  $('qPlanTotalNote').textContent=t.complete?'Original and Plan A are separate options. Choose one version.':'Plan A not specified for: '+t.missing.map(x=>x.product).join(', ');
+}
 function renderPriceComparison(item){
   const rows=[{label:'Original',goldWeight:Number(item.goldWeight)||0,unit:Number(item.unit)||0},...quoteLightOptions(item).map((o,i)=>({...o,label:planLabel(i)}))];
   return `<div class="q-comparison">${rows.map((o,i)=>`<div class="q-compare-row ${i===0?'original':''}"><strong>${o.label}</strong><span>Gold Weight ${o.goldWeight.toFixed(2)} g</span><b>AED ${o.unit.toLocaleString()}<small> / pc</small></b></div>`).join('')}</div>`;
@@ -815,7 +828,7 @@ function renderPriceComparison(item){
 
 function buildQuote(){
   calculate();if(!$('quoteDate').value)$('quoteDate').value=today();$('qCompany').textContent=$('companyName').value.trim()||'JEWELRY';$('qNo').textContent=$('quoteNo').value.trim()||'—';$('qCustomer').textContent=$('customerName').value.trim()||'—';$('qDate').textContent=$('quoteDate').value||'—';$('qValidity').textContent=Math.max(1,Math.round(n('validDays')||7))+' days';updateValidityUI();
-  const items=effectiveQuoteItems(),t=items.reduce((a,x)=>{a.qty+=Number(x.qty)||0;a.total+=Number(x.total)||0;return a},{qty:0,total:0});const full=$('fullQuoteDetails')?$('fullQuoteDetails').checked:true;$('qItemsBody').innerHTML=items.map((x,i)=>{const specs=full?`<div class="q-spec-list"><span><b>Metal:</b> ${esc(x.metal)}</span><span><b>Total Weight:</b> ${Number(x.totalWeight||0).toFixed(2)} g</span><span><b>Gold Weight:</b> ${Number(x.goldWeight||0).toFixed(2)} g</span><span><b>Stone Weight:</b> ${Number(x.stoneWeight||0).toFixed(2)} ct</span><span><b>Stone Qty:</b> ${Number(x.stoneQty||0)} pcs</span><span><b>Specification:</b> ${x.description?esc(x.description):'—'}</span></div>`:`<div class="q-item-spec">${esc(x.metal)} · Gold ${Number(x.goldWeight||0).toFixed(2)}g${Number(x.stoneWeight)>0?' · Stone '+Number(x.stoneWeight).toFixed(2)+'ct':''}</div>`;return `<tr><td colspan="4"><div class="q-line-item"><div class="q-line-thumb">${x.photo?`<img src="${x.photo}" alt="">`:''}</div><div class="q-line-details"><div class="q-item-name">${i+1}. ${esc(x.product)}</div>${specs}</div></div>${renderPriceComparison(x)}<div class="q-product-total"><span>QTY ${x.qty} · Original Subtotal</span><strong>AED ${Number(x.total).toLocaleString()}</strong></div></td></tr>`}).join('');$('qItemCount').textContent=items.length;$('qTotalQty').textContent=t.qty;$('qGrandTotal').textContent=Math.round(t.total).toLocaleString();$('qNote').textContent=$('note').value.trim();renderQuoteItems();scheduleDraftSave();
+  const items=effectiveQuoteItems(),t=items.reduce((a,x)=>{a.qty+=Number(x.qty)||0;a.total+=Number(x.total)||0;return a},{qty:0,total:0});const full=$('fullQuoteDetails')?$('fullQuoteDetails').checked:true;$('qItemsBody').innerHTML=items.map((x,i)=>{const specs=full?`<div class="q-spec-list"><span><b>Metal:</b> ${esc(x.metal)}</span><span><b>Total Weight:</b> ${Number(x.totalWeight||0).toFixed(2)} g</span><span><b>Gold Weight:</b> ${Number(x.goldWeight||0).toFixed(2)} g</span><span><b>Stone Weight:</b> ${Number(x.stoneWeight||0).toFixed(2)} ct</span><span><b>Stone Qty:</b> ${Number(x.stoneQty||0)} pcs</span><span><b>Specification:</b> ${x.description?esc(x.description):'—'}</span></div>`:`<div class="q-item-spec">${esc(x.metal)} · Gold ${Number(x.goldWeight||0).toFixed(2)}g${Number(x.stoneWeight)>0?' · Stone '+Number(x.stoneWeight).toFixed(2)+'ct':''}</div>`;return `<tr><td colspan="4"><div class="q-line-item"><div class="q-line-thumb">${x.photo?`<img src="${x.photo}" alt="">`:''}</div><div class="q-line-details"><div class="q-item-name">${i+1}. ${esc(x.product)}</div>${specs}</div></div>${renderPriceComparison(x)}${renderVersionSubtotals(x)}</td></tr>`}).join('');$('qItemCount').textContent=items.length;$('qTotalQty').textContent=t.qty;$('qGrandTotal').textContent=Math.round(t.total).toLocaleString();updateVersionTotals(items);$('qNote').textContent=$('note').value.trim();renderQuoteItems();scheduleDraftSave();
 }
 function saveSettings(){try{localStorage.setItem('jq_settings',JSON.stringify({goldPrice:n('goldPrice'),fx:n('fx'),loss:n('loss'),salesRate:n('salesRate'),settingUnit:n('settingUnit'),logoCost:n('logoCost'),autoLiveGold:$('autoLiveGold')?$('autoLiveGold').checked:true}))}catch(e){}}
 function loadSettings(){try{const x=JSON.parse(localStorage.getItem('jq_settings')||'{}');Object.keys(x).forEach(k=>{if(!$(k))return;if(k==='autoLiveGold')$(k).checked=!!x[k];else $(k).value=x[k]})}catch(e){}}
@@ -869,6 +882,7 @@ function drawContainImage(ctx,img,x,y,w,h,pad=12,bg='#ffffff'){
   ctx.save();roundRect(ctx,x,y,w,h,18);ctx.clip();ctx.drawImage(img,dx,dy,dw,dh);ctx.restore();
 }
 async function makeShareImage(){
+  if(currentProductHasData())ensureCurrentItemSaved();
   buildQuote();
   const items=effectiveQuoteItems();
   const full=$('fullQuoteDetails')?$('fullQuoteDetails').checked:true;
@@ -888,7 +902,9 @@ async function makeShareImage(){
   const headerCompany=wrap($('companyName').value||'JEWELRY','bold 46px -apple-system,Arial',content);
   const headerCustomer=wrap(`Customer: ${$('customerName').value||'—'}`,'28px -apple-system,Arial',content);
   const headerExtra=(headerCompany.length-1)*56+(headerCustomer.length-1)*38;
-  const logicalHeight=400+headerExtra+layouts.reduce((sum,l)=>sum+l.height+l.names.length*48+110+(full?88+l.specs.length*38:0)+(quoteLightOptions(l.item).length+1)*74+110,0)+320+note.length*38;
+  const missingNote=versionTotals(items).missing.map(x=>x.product).join(', ');
+  const missingHeight=wrap('Plan A not specified for: '+missingNote,'25px -apple-system,Arial',content).length*38;
+  const logicalHeight=missingHeight+400+headerExtra+layouts.reduce((sum,l)=>sum+l.height+l.names.length*48+110+(full?88+l.specs.length*38:0)+(quoteLightOptions(l.item).length+1)*110+200,0)+650+note.length*38;
   // Prefer 2160px PNG; cap very long sheets to stay within mobile canvas limits.
   const scale=Math.min(2,16384/logicalHeight,Math.sqrt(24000000/(width*logicalHeight)));
   const canvas=document.createElement('canvas');canvas.width=Math.floor(width*scale);canvas.height=Math.floor(logicalHeight*scale);
@@ -918,16 +934,23 @@ async function makeShareImage(){
     }
     const rows=[{label:'Original',goldWeight:Number(item.goldWeight)||0,unit:Number(item.unit)||0},...quoteLightOptions(item).map((o,i)=>({...o,label:planLabel(i)}))];
     for(const row of rows){
-      rule(y);text(row.label,pad,y+46,'bold 29px -apple-system,Arial','#17191d');
-      text(`Gold Weight ${row.goldWeight.toFixed(2)} g`,pad+280,y+46,'28px -apple-system,Arial');
-      text(`AED ${row.unit.toLocaleString()} / pc`,width-pad,y+46,'bold 30px -apple-system,Arial','#17191d','right');y+=74;
+      rule(y);text(row.label,pad,y+38,'bold 29px -apple-system,Arial','#17191d');
+      text(`Gold Weight ${row.goldWeight.toFixed(2)} g`,pad,y+80,'28px -apple-system,Arial');
+      text(`AED ${row.unit.toLocaleString()} / pc`,width-pad,y+58,'bold 30px -apple-system,Arial','#17191d','right');y+=110;
     }
-    rule(y);text('Original Subtotal',pad,y+46,'27px -apple-system,Arial');text(`AED ${Number(item.total).toLocaleString()}`,width-pad,y+46,'bold 31px -apple-system,Arial','#17191d','right');y+=110;
+    rule(y);text('Original Subtotal',pad,y+46,'27px -apple-system,Arial');text(`AED ${Number(item.total).toLocaleString()}`,width-pad,y+46,'bold 31px -apple-system,Arial','#17191d','right');y+=74;
+    const plan=quoteLightOptions(item)[0];
+    text('Plan A Subtotal',pad,y+46,'27px -apple-system,Arial');text(plan?'AED '+Math.round(plan.unit*Number(item.qty||0)).toLocaleString():'Not specified',width-pad,y+46,'bold 31px -apple-system,Arial','#17191d','right');y+=100;
   }
   const totals=items.reduce((a,x)=>({qty:a.qty+(Number(x.qty)||0),total:a.total+(Number(x.total)||0)}),{qty:0,total:0});
-  rule(y);text(`${items.length} ITEMS · ${totals.qty} PCS`,pad,y+50);text('GRAND TOTAL',pad,y+105,'bold 30px -apple-system,Arial','#17191d');
+  rule(y);text(`${items.length} ITEMS · ${totals.qty} PCS`,pad,y+50);text('ORIGINAL TOTAL',pad,y+105,'bold 30px -apple-system,Arial','#17191d');
   text(`AED ${Math.round(totals.total).toLocaleString()}`,width-pad,y+110,'bold 48px -apple-system,Arial','#17191d','right');y+=160;
-  if(items.some(x=>quoteLightOptions(x).length)){text('Plan prices are alternatives and are not included in the total.',pad,y+30,'25px -apple-system,Arial');y+=55;}
+  const versions=versionTotals(items);
+  text('PLAN A TOTAL',pad,y+40,'bold 30px -apple-system,Arial','#17191d');
+  text(versions.complete?'AED '+Math.round(versions.planA).toLocaleString():'Incomplete',width-pad,y+45,'bold 48px -apple-system,Arial','#17191d','right');y+=95;
+  const versionNote=versions.complete?'Original and Plan A are separate options. Choose one version.':'Plan A not specified for: '+versions.missing.map(x=>x.product).join(', ');
+  for(const line of wrap(versionNote,'25px -apple-system,Arial',content)){text(line,pad,y+30,'25px -apple-system,Arial');y+=38;}
+
   for(const line of note){text(line,pad,y+30,'26px -apple-system,Arial');y+=38;}
   // Trim the unused height so missing photos never leave large blank areas.
   const output=document.createElement('canvas');output.width=canvas.width;output.height=Math.min(canvas.height,Math.ceil((y+60)*scale));
@@ -993,4 +1016,5 @@ setInterval(()=>{updateValidityUI();if($('history').classList.contains('active')
 window.addEventListener('beforeunload',saveDraft);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveDraft()});
 </script>
 </body></html>
+
 
