@@ -71,7 +71,7 @@
     if(!quote||quote.previousElementSibling?.classList.contains('ux-client-label'))return;
     const label=document.createElement('div');
     label.className='ux-client-label';
-    label.textContent='以下为客户看到的报价预览，内部成本、汇率不会显示。';
+    label.textContent='以下为客户报价预览：显示已填写的单件费用明细，未填写或为 0 的项目不显示。';
     quote.parentNode.insertBefore(label,quote);
   }
 
