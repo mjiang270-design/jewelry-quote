@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#101114">
-<title>珠宝销售报价 V4.1</title>
+<title>珠宝销售报价 V4.2</title>
 <style>
 :root{--bg:#f4f5f7;--card:#fff;--text:#16181c;--muted:#737982;--line:#e6e8ec;--dark:#101114;--accent:#8c6a20;--soft:#f7f2e7;--blue:#0b6bcb}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
@@ -169,7 +169,7 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
 </head>
 <body>
 <div class="app">
-  <div class="topbar"><span class="brand">珠宝销售报价</span><span class="version">V4.1 Plan 克重对比报价</span></div>
+  <div class="topbar"><span class="brand">珠宝销售报价</span><span class="version">V4.2 Plan 克重对比报价</span></div>
 
   <section class="page active" id="home">
 <div class="settings">
@@ -323,7 +323,7 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
       <div class="qmeta"><div><span>Customer</span><strong id="qCustomer">—</strong></div><div><span>Date</span><strong id="qDate">—</strong></div><div><span>Validity</span><strong id="qValidity">7 days</strong></div><div><span>Valid Until</span><strong id="qValidUntil">—</strong></div><div><span>Status</span><strong id="qValidityStatus">VALID</strong></div><div><span>Currency</span><strong>AED</strong></div></div>
       <div style="padding:18px 20px 0;overflow-x:auto"><table class="quote-table"><tbody id="qItemsBody"></tbody></table></div>
       <div class="qtotals"><div class="qtotalrow"><span>Total Items</span><strong id="qItemCount">0</strong></div><div class="qtotalrow"><span>Total QTY</span><strong id="qTotalQty">0</strong></div><div class="qtotalrow grand"><span>ORIGINAL TOTAL</span><strong>AED <span id="qGrandTotal">0</span></strong></div></div>
-      <div class="qtotals" style="margin-top:0"><div class="qtotalrow grand"><span>PLAN A TOTAL</span><strong id="qPlanTotal">—</strong></div><div class="hint" id="qPlanTotalNote"></div></div><div class="qnote" id="qNote"></div>
+      <div class="qtotals" id="qPlanTotals" style="margin-top:0"><div class="qtotalrow grand"><span>PLAN A TOTAL</span><strong id="qPlanTotal">—</strong></div><div class="hint" id="qPlanTotalNote"></div></div><div class="qnote" id="qNote"></div>
     </div>
     <div class="actionrow"><button class="btn outline" onclick="window.print()">打印 / PDF</button><button class="btn outline" onclick="makeShareImage()">生成微信报价图片</button></div>
     <button class="btn finish-btn" onclick="finishQuote()">完成本次报价并清空 →</button>
@@ -829,16 +829,17 @@ function planLabel(index){
 }
 function versionTotals(items){
   const missing=items.filter(x=>!quoteLightOptions(x).length);
-  return {original:items.reduce((sum,x)=>sum+(Number(x.total)||0),0),planA:items.reduce((sum,x)=>sum+(quoteLightOptions(x)[0]?.unit||0)*(Number(x.qty)||0),0),missing,complete:missing.length===0};
+  return {original:items.reduce((sum,x)=>sum+(Number(x.total)||0),0),planA:items.reduce((sum,x)=>sum+(quoteLightOptions(x)[0]?quoteLightOptions(x)[0].unit*(Number(x.qty)||0):(Number(x.total)||0)),0),hasPlan:missing.length<items.length,missing,complete:missing.length===0};
 }
 function renderVersionSubtotals(item){
   const option=quoteLightOptions(item)[0];
-  return `<div class="q-product-total"><span>Original Subtotal · QTY ${item.qty}</span><strong>AED ${Number(item.total).toLocaleString()}</strong></div><div class="q-product-total"><span>Plan A Subtotal · QTY ${item.qty}</span><strong>${option?'AED '+Math.round(option.unit*Number(item.qty||0)).toLocaleString():'Not specified'}</strong></div>`;
+  return `<div class="q-product-total"><span>Original Subtotal · QTY ${item.qty}</span><strong>AED ${Number(item.total).toLocaleString()}</strong></div>${option?`<div class="q-product-total"><span>Plan A Subtotal · QTY ${item.qty}</span><strong>AED ${Math.round(option.unit*Number(item.qty||0)).toLocaleString()}</strong></div>`:''}`;
 }
 function updateVersionTotals(items){
   const t=versionTotals(items);
-  $('qPlanTotal').textContent=t.complete?'AED '+Math.round(t.planA).toLocaleString():'Incomplete';
-  $('qPlanTotalNote').textContent=t.complete?'Original and Plan A are separate options. Choose one version.':'Plan A not specified for: '+t.missing.map(x=>x.product).join(', ');
+  $('qPlanTotals').style.display=t.hasPlan?'':'none';
+  $('qPlanTotal').textContent=t.hasPlan?'AED '+Math.round(t.planA).toLocaleString():'';
+  $('qPlanTotalNote').textContent=!t.hasPlan?'':t.complete?'Original and Plan A are separate options. Choose one version.':'Items without Plan A retain their original price in the alternative total.';
 }
 function quotePriceBreakdown(item){
   const rows=[];
@@ -940,11 +941,6 @@ async function makeShareImage(){
   if(currentProductHasData())ensureCurrentItemSaved();
   buildQuote();
   const items=JSON.parse(JSON.stringify(effectiveQuoteItems()));
-  const missing=versionTotals(items).missing;
-  if(missing.length){
-    alert('无法生成双版本报价图片。以下产品尚未保存 Plan A 净金重：'+missing.map(x=>x.product).join('、')+'。请点击产品的“载入查看”，填写“其他克重版本”并保存后重新生成。');
-    return;
-  }
   const exportSignature=quoteExportSignature();
   const full=$('fullQuoteDetails')?$('fullQuoteDetails').checked:true;
   const width=1080,pad=80,content=width-pad*2;
@@ -963,9 +959,7 @@ async function makeShareImage(){
   const headerCompany=wrap($('companyName').value||'JEWELRY','bold 46px -apple-system,Arial',content);
   const headerCustomer=wrap(`Customer: ${$('customerName').value||'—'}`,'28px -apple-system,Arial',content);
   const headerExtra=(headerCompany.length-1)*56+(headerCustomer.length-1)*38;
-  const missingNote=versionTotals(items).missing.map(x=>x.product).join(', ');
-  const missingHeight=wrap('Plan A not specified for: '+missingNote,'25px -apple-system,Arial',content).length*38;
-  const logicalHeight=missingHeight+400+headerExtra+layouts.reduce((sum,l)=>sum+l.height+l.names.length*48+110+(full?88+l.specs.length*38:0)+(quoteLightOptions(l.item).length+1)*110+200+(quotePriceBreakdown(l.item).length?110+quotePriceBreakdown(l.item).length*48:0),0)+650+note.length*38;
+  const logicalHeight=400+headerExtra+layouts.reduce((sum,l)=>sum+l.height+l.names.length*48+110+(full?88+l.specs.length*38:0)+(quoteLightOptions(l.item).length+1)*110+200+(quotePriceBreakdown(l.item).length?110+quotePriceBreakdown(l.item).length*48:0),0)+650+note.length*38;
   // Prefer 2160px PNG; cap very long sheets to stay within mobile canvas limits.
   const scale=Math.min(2,16384/logicalHeight,Math.sqrt(24000000/(width*logicalHeight)));
   const canvas=document.createElement('canvas');canvas.width=Math.floor(width*scale);canvas.height=Math.floor(logicalHeight*scale);
@@ -1007,16 +1001,18 @@ async function makeShareImage(){
     }
     rule(y);text('Original Subtotal',pad,y+46,'27px -apple-system,Arial');text(`AED ${Number(item.total).toLocaleString()}`,width-pad,y+46,'bold 31px -apple-system,Arial','#17191d','right');y+=74;
     const plan=quoteLightOptions(item)[0];
-    text('Plan A Subtotal',pad,y+46,'27px -apple-system,Arial');text(plan?'AED '+Math.round(plan.unit*Number(item.qty||0)).toLocaleString():'Not specified',width-pad,y+46,'bold 31px -apple-system,Arial','#17191d','right');y+=100;
+    if(plan){text('Plan A Subtotal',pad,y+46,'27px -apple-system,Arial');text('AED '+Math.round(plan.unit*Number(item.qty||0)).toLocaleString(),width-pad,y+46,'bold 31px -apple-system,Arial','#17191d','right');y+=100;}
   }
   const totals=items.reduce((a,x)=>({qty:a.qty+(Number(x.qty)||0),total:a.total+(Number(x.total)||0)}),{qty:0,total:0});
   rule(y);text(`${items.length} ITEMS · ${totals.qty} PCS`,pad,y+50);text('ORIGINAL TOTAL',pad,y+105,'bold 30px -apple-system,Arial','#17191d');
   text(`AED ${Math.round(totals.total).toLocaleString()}`,width-pad,y+110,'bold 48px -apple-system,Arial','#17191d','right');y+=160;
   const versions=versionTotals(items);
-  text('PLAN A TOTAL',pad,y+40,'bold 30px -apple-system,Arial','#17191d');
-  text(versions.complete?'AED '+Math.round(versions.planA).toLocaleString():'Incomplete',width-pad,y+45,'bold 48px -apple-system,Arial','#17191d','right');y+=95;
-  const versionNote=versions.complete?'Original and Plan A are separate options. Choose one version.':'Plan A not specified for: '+versions.missing.map(x=>x.product).join(', ');
-  for(const line of wrap(versionNote,'25px -apple-system,Arial',content)){text(line,pad,y+30,'25px -apple-system,Arial');y+=38;}
+  if(versions.hasPlan){
+    text('PLAN A TOTAL',pad,y+40,'bold 30px -apple-system,Arial','#17191d');
+    text('AED '+Math.round(versions.planA).toLocaleString(),width-pad,y+45,'bold 48px -apple-system,Arial','#17191d','right');y+=95;
+    const versionNote=versions.complete?'Original and Plan A are separate options. Choose one version.':'Items without Plan A retain their original price in the alternative total.';
+    for(const line of wrap(versionNote,'25px -apple-system,Arial',content)){text(line,pad,y+30,'25px -apple-system,Arial');y+=38;}
+  }
 
   for(const line of note){text(line,pad,y+30,'26px -apple-system,Arial');y+=38;}
   // Trim the unused height so missing photos never leave large blank areas.
@@ -1085,6 +1081,7 @@ setInterval(()=>{updateValidityUI();if($('history').classList.contains('active')
 window.addEventListener('beforeunload',saveDraft);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveDraft()});
 </script>
 </body></html>
+
 
 
 

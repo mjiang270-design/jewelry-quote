@@ -92,7 +92,7 @@
     });
     if(typeof window.versionTotals==='function'){
       const versions=window.versionTotals(items);
-      if($('qPlanTotal'))$('qPlanTotal').textContent=versions.complete?money(versions.planA):'Incomplete';
+      if($('qPlanTotal'))$('qPlanTotal').textContent=versions.hasPlan?money(versions.planA):'';
     }
     rows.forEach((tr,i)=>{if(items[i]&&typeof window.renderPriceBreakdown==='function'){const el=tr.querySelector('.q-price-details');if(el)el.outerHTML=window.renderPriceBreakdown(items[i]);}});
     const total=items.reduce((s,x)=>s+(Number(x.total)||0),0);
