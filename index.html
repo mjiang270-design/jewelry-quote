@@ -852,7 +852,7 @@ function quotePriceBreakdown(item){
   if(goldFields.every(key=>item[key]!=null&&Number.isFinite(Number(item[key])))){
     quoteLightOptions(item).forEach((o,i)=>add('Gold · '+planLabel(i)+' (incl. loss)',o.goldWeight*Number(item.goldPrice)*Number(item.purity)/100*(1+Number(item.loss)/100)));
   }
-  add('Stones / Diamonds',item.diamondCost);
+  add('Diamond / Stone Cost',item.diamondCost);
   const setting=item.settingCost!=null?item.settingCost:Number(item.stoneQty)*Number(item.settingUnit);
   add('Stone Setting',setting);
   add('Labour',item.labourCost);
