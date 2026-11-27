@@ -234,7 +234,6 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
       <div class="field"><label>材质 / Karat</label><select id="metal" onchange="syncPurity()"><option value="37.5">9K Gold</option><option value="41.6667">10K Gold</option><option value="58.5">14K Gold</option><option value="75.5" selected>18K Gold</option><option value="87.5">21K Gold</option><option value="99.9">24K Gold</option></select></div>
       <div class="field"><label>含金折算系数 <span class="badge">可修改</span></label><input id="purity" type="number" value="75.5" step=".0001"><span class="unit">%</span></div>
       <div class="field"><label>总重 Total Weight</label><input id="totalWeight" type="number" value="20" step=".01"><span class="unit">g</span></div>
-      <div class="field"><label>石重 Stone Weight</label><input id="stoneWeight" type="number" value="0" step=".01"><span class="unit">ct</span></div>
       <div class="field"><label>净金重 Gold Weight</label><input id="goldWeight" type="number" value="20" step=".01"><span class="unit">g</span></div>
       <div class="field"><label>报价使用金价 <span id="goldPriceBadge" class="badge">可手动</span></label><input id="goldPrice" type="number" value="990" step=".01"><span class="unit">RMB/g</span></div>
       <div class="field"><label>Gold Loss <span class="badge">默认13%</span></label><input id="loss" type="number" value="13" step=".1"><span class="unit">%</span></div>
@@ -255,7 +254,11 @@ input:focus,select:focus{outline:2px solid #d8c69c;border-color:var(--accent)}.u
     <div class="card"><h2>石头与工费</h2><div class="grid">
       <div class="field"><label>镶石数量</label><input id="stoneQty" type="number" value="0"><span class="unit">pcs</span></div>
       <div class="field"><label>单颗镶嵌费</label><input id="settingUnit" type="number" value="3" step=".01"><span class="unit">RMB</span></div>
-      <div class="field"><label>钻石 / 石头单价（每克拉）</label><input id="diamondUnit" type="number" min="0" step=".01" placeholder="例如 1500"><span class="unit">RMB/ct</span></div><div class="field"><label>钻石 / 石头成本（单价 × 卡数）</label><input id="diamondCost" type="number" value="0" step=".01" readonly><span class="unit">RMB</span></div>
+      <div class="full" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+        <div class="field"><label>钻石 / 石头单价</label><input id="diamondUnit" type="number" min="0" step=".01" placeholder="例如 1500"><span class="unit">RMB/ct</span></div>
+        <div class="field"><label>卡数</label><input id="stoneWeight" type="number" min="0" value="0" step=".01"><span class="unit">ct</span></div>
+        <div class="field"><label>合计（自动计算）</label><input id="diamondCost" type="number" value="0" step=".01" readonly><span class="unit">RMB</span></div>
+      </div>
       <div class="field"><label>Labour 基本工费</label><input id="labourCost" type="number" value="800" step=".01"><span class="unit">RMB</span></div>
       <div class="field"><label>Logo / 字印费</label><input id="logoCost" type="number" value="35" step=".01"><span class="unit">RMB</span></div>
     </div></div>
